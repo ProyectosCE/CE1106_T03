@@ -1,44 +1,69 @@
-% Define las respuestas a diversas entradas
-respond('hola', 'Hola, como puedo ayudarte hoy?').
-respond('como estas', 'Estoy bien, gracias. Y tu?').
-respond('cual es tu nombre', 'Soy nutrichat sin nombre. Como te llamas tu?').
+% Define themes and their associated keywords
+theme('welcom', ['hola', 'como', 'estas', 'buenas', 'holi']).
+theme('goodbye', ['adios', 'hasta', 'luego','chao']).
+theme('help_need', ['ayuda', 'sobre', 'peso', 'deseo', 'quiero', 'me', 'gustaria']).
+
+
+
+
+% Define responses for themes
+theme_response('welcom', 'Hola, como puedo ayudarte?').
+theme_response('goodbye', 'hasta la proxima 👋').
+theme_response('help_need', 'Me alegro, tienes alguna enfermedad?').
+
+% Fallback responses to individual inputs
+respond('hola', 'Hola, ¿como puedo ayudarte hoy?').
+respond('como estas', 'Estoy bien, gracias. ¿Y tu?').
+respond('cual es tu nombre', 'Soy Nutrichat sin nombre. ¿Cómo te llamas tu?').
 respond('adios', '¡Hasta luego!').
 
-% Respuesta por defecto si la entrada no es reconocida
+% Default response if no input is recognized
 respond(_, 'Lo siento, no entiendo tu pregunta.').
 
-% Eliminar puntos y espacios adicionales al principio y al final de la entrada
-normalize_input(Input, Normalized) :-
-    % hace toda la entrada minuscula
+% Normalize input: convert to lowercase, remove punctuation, and convert words to atoms
+normalize_input(Input, NormalizedWords) :-
     string_lower(Input, Lowered),
-    % crea una lista separada por espacios
-    split_string(Lowered, " ", "", Parts),
-    % quita puntos y signos de pergunda
-    remove_trailing_period(Parts, TrimmedParts),
-    % vuelve a juntar todo pero clean
-    atomic_list_concat(TrimmedParts, ' ', Normalized).
+    split_string(Lowered, " ", ".,!?", Parts),  % Split by spaces and remove punctuation
+    maplist(atom_string, NormalizedWords, Parts).  % Convert strings to atoms for comparison
 
-remove_trailing_period([Last], []) :-  
-    sub_string(Last, _, 1, 0, '.').
-remove_trailing_period(List, List).
+% Match words with a theme
+match_theme(Words, Theme, Count) :-
+    theme(Theme, Keywords),
+    count_matches(Words, Keywords, 0, Count).
 
-% Bucle principal de interaccion
+% Count how many words match the theme keywords
+count_matches([], _, Count, Count).
+count_matches([Word|Rest], Keywords, Acc, Count) :-
+    (   member(Word, Keywords)
+    ->  NewAcc is Acc + 1
+    ;   NewAcc is Acc
+    ),
+    count_matches(Rest, Keywords, NewAcc, Count).
+
+% Check if a theme matches the input words
+find_matching_theme(Words, Theme) :-
+    match_theme(Words, Theme, Count),
+    Count >= 2.
+
+% Main interaction loop
 chat :-
     write('Tu: '),
-    % tira lo que tiene en cola
-    flush_output, 
-    % esto lee la entrada y la convierte en un string
+    flush_output,
     read_line_to_string(user_input, InputRaw),
-    % esto hace varias cosas, vamos a la funcion
-    normalize_input(InputRaw, Input),
-    (   Input == 'adios'
+    normalize_input(InputRaw, Words),
+    (   Words == ['adios']
     ->  write('Chatbot: ¡Hasta luego!'), nl
-    ;   respond(Input, Response),
-        write('Chatbot: '), write(Response), nl,
+    ;   (   find_matching_theme(Words, Theme)
+        ->  theme_response(Theme, Response),
+            write('Chatbot: '), write(Response), nl
+        ;   atomic_list_concat(Words, ' ', Input),
+            respond(Input, Response),
+            write('Chatbot: '), write(Response), nl
+        ),
         chat
     ).
 
-% Punto de entrada
+% Entry point
 comienzo :-
     write('Bienvenido al chatbot. Escribe "adios" para terminar.'), nl,
     chat.
