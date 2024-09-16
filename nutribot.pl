@@ -1,7 +1,8 @@
 % Define themes and their associated keywords
-theme('welcom', ['hola', 'como', 'estas', 'buenas', 'holi']).
+theme('welcom', ['hola', 'como', 'estas', 'buenas', 'holi','holap','uwu']).
 theme('goodbye', ['adios', 'hasta', 'luego','chao']).
 theme('help_need', ['ayuda', 'sobre', 'peso', 'deseo', 'quiero', 'me', 'gustaria']).
+
 
 
 
@@ -9,7 +10,7 @@ theme('help_need', ['ayuda', 'sobre', 'peso', 'deseo', 'quiero', 'me', 'gustaria
 % Define responses for themes
 theme_response('welcom', 'Hola, como puedo ayudarte?').
 theme_response('goodbye', 'hasta la proxima 👋').
-theme_response('help_need', 'Me alegro, tienes alguna enfermedad?').
+theme_response('help_need', 'Soy tu nutricionista profesional para ayudarte,padeces de alguna enfermedad ?').
 
 % Fallback responses to individual inputs
 respond('hola', 'Hola, ¿como puedo ayudarte hoy?').
