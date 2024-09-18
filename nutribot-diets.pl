@@ -1,3 +1,21 @@
+%! dieta(+NombreDieta:atom, +DescripcionDieta:atom) is det.
+%
+%  Registra una dieta con su nombre y descripción detallada de las comidas para cada parte del día.
+%
+%  @param NombreDieta       El nombre de la dieta, un átomo que describe el tipo de dieta.
+%  @param DescripcionDieta  La descripción de la dieta, un átomo que contiene los detalles de las comidas (desayuno, merienda, almuerzo, etc.).
+%
+%  @description 
+%  Esta regla asocia un nombre de dieta con un plan detallado de comidas para cada momento del día. 
+%  El formato de la descripción incluye desayuno, merienda (mañana y tarde), almuerzo, y cena, especificando cantidades de ingredientes. 
+%  Las dietas están diseñadas para distintos objetivos, como bajo en calorías, alta en proteínas, vegetariana, cetogénica, etc.
+%
+%  @example 
+%    ?- dieta('Dieta Cetogénica (Keto, baja en carbohidratos)', 
+%    'Desayuno: 3 huevos revueltos con queso cheddar, espinacas, y tocino. Almuerzo: Ensalada de atún con aguacate y mayonesa. Cena: Salmón a la plancha con brócoli.').
+%
+%    @returns True si la dieta se ha definido correctamente. Falso en caso contrario.
+
 dieta('Dieta Cetogénica (Keto, baja en carbohidratos)', 
     'Desayuno: 3 huevos revueltos (150g) con 30g de queso cheddar, 50g de espinacas, y 2 tiras de tocino (30g). Merienda Mañana: 30g de nueces y 30g de queso. Almuerzo: Ensalada de 150g de atún, 100g de aguacate, 20g de mayonesa, y 10 aceitunas (30g). Merienda Tarde: 100g de yogurt griego natural con 10g de semillas de chía. Cena: 150g de salmón a la plancha con 100g de brócoli y 10g de mantequilla.').
 
