@@ -1,24 +1,40 @@
+:- consult('nutribot-BNF').
+
+% Verificación de temas y respuestas
+
+dieta('alta en proteina',["no",'alta','proteica']).
+dieta('vegana',['colesterol alto','media','vegana']).
+
+user("profile",[]).
+
 % Define themes and their associated keywords
 theme('welcom', ['hola', 'como', 'estas', 'buenas', 'holi','holap','uwu']).
 theme('goodbye', ['adios', 'hasta', 'luego','chao']).
 theme('help_need', ['ayuda', 'sobre', 'peso', 'deseo', 'quiero', 'me', 'gustaria']).
-
-
-
-
+theme('Dislipidemia',['problema','control','colesterol','Dislipidemia']).
+theme('Hipercolesterolemia',['Hipercolesterolemia','aumento','niveles','colesterol','sangre']).
+theme('actividad_alta', ['mas', '5', 'veces', 'alta', 'frecuente', 'diariamente']).
+theme('actividad_media', ['3', 'veces', 'media', 'moderada','mucho']).
+theme('actividad_baja', ['menos', '3' ,'veces', 'baja', 'poco', 'sedentario','no','hago','ejercicio','casi','nada']).
+theme('saludable',['no','enfermo','saludable','estoy']).
 
 % Define responses for themes
 theme_response('welcom', 'Hola, como puedo ayudarte?').
 theme_response('goodbye', 'hasta la proxima 👋').
-theme_response('help_need', 'Soy tu nutricionista profesional para ayudarte,padeces de alguna enfermedad ?').
+theme_response('help_need', 'Soy tu nutricionista profesional para ayudarte, ¿padeces de alguna enfermedad?').
+theme_response('Dislipidemia','Te recomendaría una dieta baja en grasas, ¿qué tanta actividad física haces?').
+theme_response('Hipercolesterolemia','Te recomendaría una dieta vegana, ¿qué tanta actividad física haces?').
+
+theme_response('actividad_alta', '¡Genial! Hacer actividad más de 5 veces por semana es excelente para tu salud.').
+theme_response('actividad_media', 'Hacer ejercicio 3 veces por semana es un buen inicio, sigue así.').
+theme_response('actividad_baja', 'Es importante aumentar tu actividad física para mejorar tu salud, intenta hacer ejercicio al menos 3 veces por semana.').
 
 % Fallback responses to individual inputs
-respond('hola', 'Hola, ¿como puedo ayudarte hoy?').
-respond('como estas', 'Estoy bien, gracias. ¿Y tu?').
-respond('cual es tu nombre', 'Soy Nutrichat sin nombre. ¿Cómo te llamas tu?').
+respond('hola', 'Hola, ¿cómo puedo ayudarte hoy?').
+respond('como estas', 'Estoy bien, gracias. ¿Y tú?').
+respond('cual es tu nombre', 'Soy Nutrichat sin nombre. ¿Cómo te llamas tú?').
 respond('adios', '¡Hasta luego!').
 
-% Default response if no input is recognized
 respond(_, 'Lo siento, no entiendo tu pregunta.').
 
 % Normalize input: convert to lowercase, remove punctuation, and convert words to atoms
@@ -46,7 +62,7 @@ find_matching_theme(Words, Theme) :-
     match_theme(Words, Theme, Count),
     Count >= 2.
 
-% Main interaction loop
+% Main interaction loop with grammatical check
 chat :-
     write('Tu: '),
     flush_output,
@@ -54,12 +70,15 @@ chat :-
     normalize_input(InputRaw, Words),
     (   Words == ['adios']
     ->  write('Chatbot: ¡Hasta luego!'), nl
-    ;   (   find_matching_theme(Words, Theme)
-        ->  theme_response(Theme, Response),
-            write('Chatbot: '), write(Response), nl
-        ;   atomic_list_concat(Words, ' ', Input),
-            respond(Input, Response),
-            write('Chatbot: '), write(Response), nl
+    ;   (   validacion_gramatical(Words)  % Valida la gramática antes de continuar
+        ->  (   find_matching_theme(Words, Theme)
+            ->  theme_response(Theme, Response),
+                write('Chatbot: '), write(Response), nl
+            ;   atomic_list_concat(Words, ' ', Input),
+                respond(Input, Response),
+                write('Chatbot: '), write(Response), nl
+            )
+        ;   true  % Si falla la validación gramatical, se pide nueva entrada
         ),
         chat
     ).
