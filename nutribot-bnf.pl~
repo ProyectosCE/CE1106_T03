@@ -1,23 +1,22 @@
 %! <module> NutriBot BNF
 %
-%  Este modulo define un sistema de conversacion simple en Prolog para
-%  NutriTec. Permite reconocer palabras clave, clasificar oraciones y
-%  validar su correccion gramatical de acuerdo a una gramatica de
-%  frases nominales y verbales.
+%  Este módulo define un sistema de conversación simple en Prolog para NutriTec. 
+%  Permite reconocer palabras clave, clasificar oraciones y validar su corrección 
+%  gramatical de acuerdo a una gramática de frases nominales y verbales.
 %
-%  El sistema incluye palabras clave de inicio y fin de conversacion,
-%  asi como respuestas positivas y negativas, y utiliza reglas para
-%  verificar si las oraciones son gramaticalmente correctas.
+%  El sistema incluye palabras clave de inicio y fin de conversación, así como 
+%  respuestas positivas y negativas, y utiliza reglas para verificar si las 
+%  oraciones son gramaticalmente correctas.
 %
 %  @author Jose Eduardo Campos Salazar
 %  @version 1.0
 %
 
 %! start(+Lista) is det.
-%
-%  Palabras clave para iniciar la conversacion con el sistema.
-%
-%  @param Lista Una lista de palabras clave que inician la conversacion.
+%  
+%  Palabras clave para iniciar la conversación con el sistema.
+%  
+%  @param Lista Una lista de palabras clave que inician la conversación.
 %
 %  @example
 %  ?- start([hola]).
@@ -30,11 +29,10 @@ start([nutritec]).
 
 %! final(+Lista) is det.
 %
-%  Palabras clave para finalizar la conversacion con el sistema.
-%
-%  @param Lista Una lista de palabras clave que finalizan la
-%  conversacion.
-%
+%  Palabras clave para finalizar la conversación con el sistema.
+%  
+%  @param Lista Una lista de palabras clave que finalizan la conversación.
+%  
 %  @example
 %  ?- final([gracias]).
 %  true.
@@ -44,9 +42,9 @@ final([chao]).
 final([adios]).
 
 %! negative(+Palabras, -Restante) is det.
-%
+%  
 %  Define respuestas negativas en el sistema.
-%
+%  
 %  @param Palabras Una lista de palabras que representa una respuesta negativa.
 %  @param Restante La lista restante después de procesar la respuesta negativa.
 %
@@ -65,7 +63,7 @@ negative(['Nada'|S], S).
 %! positive(+Palabras, -Restante) is det.
 %
 %  Define respuestas positivas en el sistema.
-%
+%  
 %  @param Palabras Una lista de palabras que representa una respuesta positiva.
 %  @param Restante La lista restante después de procesar la respuesta positiva.
 %
@@ -76,9 +74,9 @@ positive([si|S], S).
 positive([claro|S], S).
 
 %! determinante(+Palabras, -Restante) is det.
-%
-%  Define determinantes en una oracion.
-%
+%  
+%  Define determinantes en una oración.
+%  
 %  @param Palabras Una lista de palabras que comienza con un determinante.
 %  @param Restante La lista restante después de procesar el determinante.
 %
@@ -89,11 +87,11 @@ determinante([yo|S], S).
 determinante(['Yo'|S], S).
 
 %! sustantivo_g(+Palabras, -Restante) is det.
-%
-%  Define un sustantivo general en una oracion.
-%
+%  
+%  Define un sustantivo general en una oración.
+%  
 %  @param Palabras Una lista de palabras con un sustantivo general.
-%  @param Restante La lista restante despues de procesar el sustantivo.
+%  @param Restante La lista restante después de procesar el sustantivo.
 %
 %  @example
 %  ?- sustantivo_g([persona, es, muy, saludable], S).
@@ -102,10 +100,10 @@ sustantivo_g([_|S], S).
 
 %! verb(+Palabras, -Restante) is det.
 %
-%  Define los verbos conjugados que pueden aparecer en una oracion.
-%
-%  @param Palabras Una lista de palabras que contiene un verbo valido.
-%  @param Restante La lista restante despues de procesar el verbo.
+%  Define los verbos conjugados que pueden aparecer en una oración.
+%  
+%  @param Palabras Una lista de palabras que contiene un verbo válido.
+%  @param Restante La lista restante después de procesar el verbo.
 %
 %  @example
 %  ?- verb([deseo, llevar, una, dieta], S).
@@ -144,12 +142,10 @@ verb(['Deseo', 'llevar'|S], S).
 
 %! oracion(+Palabras, -Restante) is det.
 %
-%  Verifica si una lista de palabras es una oracion vslida de acuerdo
-%  con las reglas gramaticales.
-%
-%  @param Palabras Una lista de palabras que representa una oracion.
-%  @param Restante Una lista vacía al finalizar, lo que indica que la
-%  oracion es valida.
+%  Verifica si una lista de palabras es una oración válida de acuerdo con las reglas gramaticales.
+%  
+%  @param Palabras Una lista de palabras que representa una oración.
+%  @param Restante Una lista vacía al finalizar, lo que indica que la oración es válida.
 %
 %  @example
 %  ?- oracion([yo, deseo, llevar, una, dieta], []).
@@ -158,11 +154,10 @@ oracion(A, B):- sintagma_nominal(A, C).
 
 %! sintagma_nominal(+Palabras, -Restante) is det.
 %
-%  Elimina el primer sintagma nominal encontrado en la oracion.
-%
+%  Elimina el primer sintagma nominal encontrado en la oración.
+%  
 %  @param Palabras Una lista de palabras que contiene un sintagma nominal.
-%  @param Restante La lista restante despues de procesar el sintagma
-%  nominal.
+%  @param Restante La lista restante después de procesar el sintagma nominal.
 %
 %  @example
 %  ?- sintagma_nominal([yo, quiero, una, dieta], S).
@@ -174,7 +169,7 @@ sintagma_nominal(A, B):- sintagma_verbal(A, B).
 %! sintagma_verbal(+Palabras, -Restante) is det.
 %
 %  Elimina el primer sintagma verbal encontrado en la oración.
-%
+%  
 %  @param Palabras Una lista de palabras que contiene un sintagma verbal.
 %  @param Restante La lista restante después de procesar el sintagma verbal.
 %
@@ -185,11 +180,9 @@ sintagma_verbal(A, B):- verb(A, B).
 
 %! validacion_gramatical(+Oracion) is det.
 %
-%  Valida si la oracion digitada por el usuario es gramaticalmente
-%  correcta.
-%
-%  @param Oracion Una lista de palabras que representa la oracion a
-%  validar.
+%  Valida si la oración digitada por el usuario es gramaticalmente correcta.
+%  
+%  @param Oracion Una lista de palabras que representa la oración a validar.
 %
 %  @example
 %  ?- validacion_gramatical([yo, quiero, llevar, una, dieta]).
