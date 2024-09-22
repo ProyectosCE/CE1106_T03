@@ -1,5 +1,5 @@
 :- consult('nutribot-BNF').
-:- consult('nutribot-diets').
+
 
 % Verificación de temas y respuestas
 

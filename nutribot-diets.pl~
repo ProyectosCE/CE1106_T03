@@ -1,4 +1,4 @@
-/** Base de datos de dietas
+/** <module> Base de datos de dietas
  *
  * Esta base de datos contiene diferentes planes de dieta estructurados segun
  * distintos objetivos nutricionales y estilos de vida. Cada entrada en la base
