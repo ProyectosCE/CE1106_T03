@@ -1,8 +1,26 @@
+/**
+ * Lista de mensajes en la interfaz.
+ * @type {Array<Object>}
+ */
 let messages = [];
+
+/**
+ * Estado que indica si el reconocimiento de voz está activo.
+ * @type {boolean}
+ */
 let isListening = false;
+
+/**
+ * Estado que indica si el Text-to-Speech está activado.
+ * @type {boolean}
+ */
 let isTTSActive = false;
 
-// Función para agregar un mensaje a la interfaz
+/**
+ * Agrega un mensaje a la interfaz del chat.
+ * @param {string} text - El texto del mensaje.
+ * @param {string} sender - El remitente del mensaje, puede ser 'user' o 'bot'.
+ */
 function addMessage(text, sender) {
   const chatBox = document.getElementById('chat-box');
   const messageDiv = document.createElement('div');
@@ -12,7 +30,12 @@ function addMessage(text, sender) {
   chatBox.scrollTop = chatBox.scrollHeight; // Scroll automático al final
 }
 
-// Función para enviar la consulta al servidor
+/**
+ * Envía una consulta al servidor y maneja la respuesta.
+ * Muestra el mensaje del usuario en la interfaz y el mensaje del bot tras la respuesta del servidor.
+ * Si está activado, utiliza Text-to-Speech para leer la respuesta en voz alta.
+ * @returns {Promise<void>}
+ */
 async function sendQuery() {
   const queryInput = document.getElementById('input-query');
   const queryText = queryInput.value.trim();
@@ -56,7 +79,11 @@ async function sendQuery() {
   }
 }
 
-// Función para activar el reconocimiento de voz
+/**
+ * Activa el reconocimiento de voz del navegador.
+ * Si el navegador no soporta reconocimiento de voz, muestra una alerta.
+ * Envía la transcripción del reconocimiento como consulta al servidor.
+ */
 function handleSpeechRecognition() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
@@ -90,12 +117,17 @@ function handleSpeechRecognition() {
   recognition.start();  // Comenzar a escuchar
 }
 
-// Función para activar/desactivar Text-to-Speech
+/**
+ * Activa o desactiva la funcionalidad de Text-to-Speech (TTS) basado en el estado del checkbox.
+ */
 function toggleTTS() {
   isTTSActive = document.getElementById('tts-toggle').checked;
 }
 
-// Función para hablar el texto usando Text-to-Speech
+/**
+ * Convierte un texto a voz usando la API de Text-to-Speech del navegador.
+ * @param {string} text - El texto a ser leído en voz alta.
+ */
 function speakText(text) {
   const synth = window.speechSynthesis;
   if (synth) {
