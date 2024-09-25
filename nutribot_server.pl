@@ -15,27 +15,26 @@ server(Port) :-
 
 % Manejo de la solicitud HTTP con soporte UTF-8 y CORS
 handle_chat_request(Request) :-
-    memberchk(method(Options), Request),     % Verificar el método de la solicitud
+    memberchk(method(Options), Request),
     handle_options(Options, Request).
 
 % Manejar solicitudes POST y OPTIONS
 handle_options(post, Request) :-
     !,  % Manejar la solicitud POST
-    cors_enable(Request),
+    cors_enable,
     http_read_json_dict(Request, QueryDict),  % Leer JSON de la solicitud
     Query = QueryDict.get(query),             % Obtener la consulta desde el JSON
     process_query(Query, Response),           % Procesar la consulta con el chatbot
-    format('Content-type: application/json; charset=UTF-8~n~n'),  % Asegurar que la respuesta esté en UTF-8
-    reply_json_dict(_{response: Response}, [json_object(dict)]).   % Enviar la respuesta correctamente en UTF-8
+    reply_json_dict(_{response: Response}, [json_object(dict)]).  % Enviar la respuesta como JSON puro
 
-handle_options(options, Request) :-
+handle_options(options, _Request) :-
     !,  % Manejar la solicitud OPTIONS
-    cors_enable(Request),
+    cors_enable,
     format('Content-type: text/plain~n~n'),
     format('OK').
 
 % Habilitar CORS para las respuestas
-cors_enable(_Request) :-
+cors_enable :-
     format('Access-Control-Allow-Origin: *~n'),  % Permitir solicitudes desde cualquier origen
     format('Access-Control-Allow-Methods: POST, OPTIONS~n'),  % Permitir métodos POST y OPTIONS
     format('Access-Control-Allow-Headers: Content-Type~n').  % Permitir el encabezado Content-Type
