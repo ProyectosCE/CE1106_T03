@@ -1,4 +1,4 @@
-/** <module> NutriBot BNF
+/** NutriBot BNF
 
 Este modulo define un sistema de conversacion simple en Prolog para
 NutriTec. Permite reconocer palabras clave, clasificar oraciones y
@@ -16,7 +16,7 @@ si las oraciones son gramaticalmente correctas.
 
 :-style_check(-singleton).
 
-/** start/1
+/** start
  *
  * Palabras clave para iniciar la conversacion con el sistema.
  *
@@ -33,7 +33,7 @@ start([buenas]).
 start([buenos]).
 start([nutritec]).
 
-/** final/1
+/** final
  *
  * Palabras clave para finalizar la conversacion con el sistema.
  *
@@ -50,7 +50,7 @@ final([muchas,gracias]).
 final([chao]).
 final([adios]).
 
-/** negative/2
+/** negative
  *
  * Define respuestas negativas en el sistema.
  *
@@ -72,7 +72,7 @@ negative(['Jamas'|S],S).
 negative([nada|S],S).
 negative(['Nada'|S],S).
 
-/** positive/2
+/** positive
  *
  * Define respuestas positivas en el sistema.
  *
@@ -88,7 +88,7 @@ negative(['Nada'|S],S).
 positive([si|S],S).
 positive([claro|S],S).
 
-/** determinante/2
+/** determinante
  *
  * Define determinantes en una oracion.
  *
@@ -104,7 +104,7 @@ positive([claro|S],S).
 determinante([yo|S],S).
 determinante(['Yo'|S],S).
 
-/** sustantivo_g/2
+/** sustantivo_g
  *
  * Define un sustantivo general en una oracion.
  *
@@ -118,7 +118,7 @@ determinante(['Yo'|S],S).
  */
 sustantivo_g([_|S],S).
 
-/** verb/2
+/** verb
  *
  * Define los verbos conjugados que pueden aparecer en una oracion.
  *
@@ -162,12 +162,12 @@ verb(['Me','gustaria'|S],S).
 verb(['Me','diagnosticaron'|S],S).
 verb(['Deseo','llevar'|S],S).
 
-/** oracion/2
+/** oracion
  *
  * Verifica si una lista de palabras es una oracion valida de acuerdo
  * con las reglas gramaticales.
  *
- * @param Palabras Una lista de palabras que representa una oración.
+ * @param Palabras Una lista de palabras que representa una oracion.
  * @param Restante Una lista vacia al finalizar, lo que indica que la
  * oracion es valida.
  *
@@ -178,7 +178,7 @@ verb(['Deseo','llevar'|S],S).
  */
 oracion(A,B):- sintagma_nominal(A,C).
 
-/** sintagma_nominal/2
+/** sintagma_nominal
  *
  * Elimina el primer sintagma nominal encontrado en la oracion.
  *
@@ -195,7 +195,7 @@ sintagma_nominal(A,B):- determinante(A,C), sintagma_verbal(C,Z), sustantivo_g(Z,
 sintagma_nominal(A,B):- sintagma_verbal(A,C), sustantivo_g(C,B).
 sintagma_nominal(A,B):- sintagma_verbal(A,B).
 
-/** sintagma_verbal/2
+/** sintagma_verbal
  *
  * Elimina el primer sintagma verbal encontrado en la oracion.
  *
@@ -210,7 +210,7 @@ sintagma_nominal(A,B):- sintagma_verbal(A,B).
  */
 sintagma_verbal(A,B):- verb(A,B).
 
-/** validacion_gramatical/1
+/** validacion_gramatical
  *
  * Valida si la oracion digitada por el usuario es gramaticalmente
  * correcta.
