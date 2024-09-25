@@ -17,7 +17,7 @@ theme('Hipercolesterolemia',['Hipercolesterolemia','aumento','niveles','colester
 theme('actividad_alta', ['mas', '5', 'veces', 'alta', 'frecuente', 'diariamente']).
 theme('actividad_media', ['3', 'veces', 'media', 'moderada','mucho']).
 theme('actividad_baja', ['menos', '3' ,'veces', 'baja', 'poco', 'sedentario','no','hago','ejercicio','casi','nada']).
-theme('saludable',['no','enfermo','saludable','estoy']).
+theme('saludable',['no','enfermo','saludable','estoy','tengo','nada']).
 
 % Define responses for themes
 theme_response('welcom', 'Hola, como puedo ayudarte?').
@@ -29,13 +29,14 @@ theme_response('Hipercolesterolemia','Te recomendaría una dieta vegana, ¿qué 
 theme_response('actividad_alta', '¡Genial! Hacer actividad más de 5 veces por semana es excelente para tu salud.').
 theme_response('actividad_media', 'Hacer ejercicio 3 veces por semana es un buen inicio, sigue así.').
 theme_response('actividad_baja', 'Es importante aumentar tu actividad física para mejorar tu salud, intenta hacer ejercicio al menos 3 veces por semana.').
+theme_response('saludable', 'ya veo, que tal tu actividad fisica? haces ejercicio?').
+
 
 % Fallback responses to individual inputs
 respond('hola', 'Hola, ¿cómo puedo ayudarte hoy?').
 respond('como estas', 'Estoy bien, gracias. ¿Y tú?').
 respond('cual es tu nombre', 'Soy Nutrichat sin nombre. ¿Cómo te llamas tú?').
 respond('adios', '¡Hasta luego!').
-
 respond(_, 'Lo siento, no entiendo tu pregunta.').
 
 % Normalize input: convert to lowercase, remove punctuation, and convert words to atoms
@@ -64,14 +65,15 @@ find_matching_theme(Words, Theme) :-
     Count >= 2.
 
 % Main interaction loop with grammatical check
-chat :-
+chat :- 
     write('Tu: '),
     flush_output,
     read_line_to_string(user_input, InputRaw),
     normalize_input(InputRaw, Words),
     (   Words == ['adios']
     ->  write('Chatbot: ¡Hasta luego!'), nl
-    ;   (   validacion_gramatical(Words)  % Valida la gramática antes de continuar
+    ;   (   write('Debug: Validando oracion: '), write(Words), nl,  % Debug: Mostrar palabras a validar
+            validacion_gramatical(Words)  % Valida la gramática antes de continuar
         ->  (   find_matching_theme(Words, Theme)
             ->  theme_response(Theme, Response),
                 write('Chatbot: '), write(Response), nl
