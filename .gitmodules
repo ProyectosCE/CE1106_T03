@@ -1,6 +1,3 @@
-[submodule "nutibot-cliente"]
-	path = nutibot-cliente
-	url = git@github.com:ProyectosCE/nutribot_client.git
 [submodule "nutribot-cliente"]
 	path = nutribot-cliente
 	url = git@github.com:ProyectosCE/CE1106_T03_nutribot_client.git
