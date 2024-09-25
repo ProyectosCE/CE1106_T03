@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutribot Chat</title>
+</head>
+<body>
+    <h1>Nutribot Chat</h1>
+    <input type="text" id="queryInput" placeholder="Escribe tu consulta">
+    <button onclick="sendQuery()">Enviar</button>
+
+    <p>Respuesta del Nutribot: <span id="response"></span></p>
+
+    <script>
+        async function sendQuery() {
+            const query = document.getElementById('queryInput').value;
+
+            try {
+                const response = await fetch('http://localhost:8080/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                const data = await response.json();
+                document.getElementById('response').innerText = data.response;
+            } catch (error) {
+                console.error("Error al hacer la consulta:", error);
+            }
+        }
+    </script>
+</body>
+</html>
