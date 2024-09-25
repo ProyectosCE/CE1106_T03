@@ -1,227 +1,118 @@
-/** NutriBot BNF
-
-Este modulo define un sistema de conversacion simple en Prolog para
-NutriTec. Permite reconocer palabras clave, clasificar oraciones y
-validar su correccion gramatical de acuerdo a una gramatica de frases
-nominales y verbales.
-
-El sistema incluye palabras clave de inicio y fin de conversacion, asi
-como respuestas positivas y negativas, y utiliza reglas para verificar
-si las oraciones son gramaticalmente correctas.
-
-@author Jose Eduardo Campos Salazar
-@version 1.0
-*/
-
+/** NutriBot BNF */
 
 :-style_check(-singleton).
+:- set_prolog_flag(double_quotes, chars).
 
-/** start
- *
- * Palabras clave para iniciar la conversacion con el sistema.
- *
- * @param Lista Una lista de palabras clave que inician la conversacion.
- *
- * ==
- * ?- start([hola]).
- * true.
- * ==
- */
+/** start */
 start([hola]).
 start([iniciar]).
 start([buenas]).
 start([buenos]).
 start([nutritec]).
 
-/** final
- *
- * Palabras clave para finalizar la conversacion con el sistema.
- *
- * @param Lista Una lista de palabras clave que finalizan la
- * conversacion.
- *
- * ==
- * ?- final([gracias]).
- * true.
- * ==
- */
+/** final */
 final([gracias]).
 final([muchas,gracias]).
 final([chao]).
 final([adios]).
 
-/** negative
- *
- * Define respuestas negativas en el sistema.
- *
- * @param Palabras Una lista de palabras que representa una respuesta negativa.
- * @param Restante La lista restante despues de procesar la respuesta
- * negativa.
- *
- * ==
- * ?- negative([no,hago,ejercicio],S).
- * S = [hago, ejercicio].
- * ==
- */
+/** negative */
 negative([no|S],S).
-negative(['No'|S],S).
 negative([nunca|S],S).
-negative(['Nunca'|S],S).
 negative([jamas|S],S).
-negative(['Jamas'|S],S).
 negative([nada|S],S).
-negative(['Nada'|S],S).
 
-/** positive
- *
- * Define respuestas positivas en el sistema.
- *
- * @param Palabras Una lista de palabras que representa una respuesta positiva.
- * @param Restante La lista restante despues de procesar la respuesta
- * positiva.
- *
- * ==
- * ?- positive([si,me,gustaria],S).
- * S = [me, gustaria].
- * ==
- */
+/** positive */
 positive([si|S],S).
 positive([claro|S],S).
+positive([por,supuesto|S],S).
+positive([definitivamente|S],S).
 
-/** determinante
- *
- * Define determinantes en una oracion.
- *
- * @param Palabras Una lista de palabras que comienza con un determinante.
- * @param Restante La lista restante despues de procesar el
- * determinante.
- *
- * ==
- * ?- determinante([yo,hago,ejercicio],S).
- * S = [hago, ejercicio].
- * ==
- */
+/** determinante */
 determinante([yo|S],S).
-determinante(['Yo'|S],S).
+determinante([el|S],S).
+determinante([la|S],S).
+determinante([los|S],S).
+determinante([las|S],S).
+determinante([mi|S],S).
+determinante([tu|S],S).
+determinante([su|S],S).
+determinante([un|S],S).
+determinante([una|S],S).
 
-/** sustantivo_g
- *
- * Define un sustantivo general en una oracion.
- *
- * @param Palabras Una lista de palabras con un sustantivo general.
- * @param Restante La lista restante despues de procesar el sustantivo.
- *
- * ==
- * ?- sustantivo_g([persona,es,muy,saludable],S).
- * S = [es, muy, saludable].
- * ==
- */
-sustantivo_g([_|S],S).
+/** sustantivo_g */
+sustantivo_g([colesterol|S],S).
+sustantivo_g([sangre|S],S).
+sustantivo_g([ejercicio|S],S).
+sustantivo_g([problemas|S],S).
+sustantivo_g([persona|S],S).
+sustantivo_g([dieta|S],S).
+sustantivo_g([salud|S],S).
+sustantivo_g([peso|S],S).
+sustantivo_g([alimentacion|S],S).
+sustantivo_g([vida|S],S).
+sustantivo_g([_,_|S],S).  % Skips over unrecognized nouns
 
-/** verb
- *
- * Define los verbos conjugados que pueden aparecer en una oracion.
- *
- * @param Palabras Una lista de palabras que contiene un verbo valido.
- * @param Restante La lista restante despues de procesar el verbo.
- *
- * ==
- * ?- verb([deseo,llevar,una,dieta],S).
- * S = [llevar, una, dieta].
- * ==
- */
+/** verb */
 verb([deseo|S],S).
 verb([tengo|S],S).
 verb([gustaria|S],S).
-verb([pensado|S],S).
-verb([llevar|S],S).
-verb([estoy|S],S).
-verb([diagnosticado|S],S).
-verb([habia|S],S).
-verb([realizar|S],S).
-verb([quiero|S],S).
+verb([perder|S],S).
+verb([bajar|S],S).  % Handles 'bajar de peso'
+verb([controlando|S],S).
+verb([controlo|S],S).
 verb([hago|S],S).
 verb([realizo|S],S).
-verb([me,gustaria|S],S).
-verb([me,diagnosticaron|S],S).
-verb([deseo,llevar|S],S).
-verb(['Deseo'|S],S).
-verb(['Tengo'|S],S).
-verb(['Gustaria'|S],S).
-verb(['Pensado'|S],S).
-verb(['Llevar'|S],S).
-verb(['Estoy'|S],S).
-verb(['Diagnosticado'|S],S).
-verb(['Habia'|S],S).
-verb(['Realizar'|S],S).
-verb(['Quiero'|S],S).
-verb(['Hago'|S],S).
-verb(['Realizo'|S],S).
-verb(['Me','gustan'|S],S).
-verb(['Me','gustaria'|S],S).
-verb(['Me','diagnosticaron'|S],S).
-verb(['Deseo','llevar'|S],S).
+verb([practico|S],S).
+verb([estas|S],S).  % Handles "como estas"
+verb([_,_|S],S).
 
-/** oracion
- *
- * Verifica si una lista de palabras es una oracion valida de acuerdo
- * con las reglas gramaticales.
- *
- * @param Palabras Una lista de palabras que representa una oracion.
- * @param Restante Una lista vacia al finalizar, lo que indica que la
- * oracion es valida.
- *
- * ==
- * ?- oracion([yo,deseo,llevar,una,dieta],[]).
- * true.
- * ==
- */
-oracion(A,B):- sintagma_nominal(A,C).
+/** adverbs */
+adverb([bastante|S],S).  % Handles "bastante" (quite)
+adverb([mucho|S],S).     % Handles "mucho" (a lot)
+adverb([poco|S],S).      % Handles "poco" (a little)
+adverb(S,S).             % Allows flexibility if no adverb is present
 
-/** sintagma_nominal
- *
- * Elimina el primer sintagma nominal encontrado en la oracion.
- *
- * @param Palabras Una lista de palabras que contiene un sintagma nominal.
- * @param Restante La lista restante despues de procesar el sintagma
- * nominal.
- *
- * ==
- * ?- sintagma_nominal([yo,quiero,una,dieta],S).
- * S = [dieta].
- * ==
- */
-sintagma_nominal(A,B):- determinante(A,C), sintagma_verbal(C,Z), sustantivo_g(Z,B).
-sintagma_nominal(A,B):- sintagma_verbal(A,C), sustantivo_g(C,B).
-sintagma_nominal(A,B):- sintagma_verbal(A,B).
+/** prepositional phrases and modifiers */
+modifier([al,menos|S],S).  % Handles "al menos"
+modifier([mas,de|S],S).     % Handles "más de"
+modifier([menos,de|S],S).   % Handles "menos de"
+modifier(S,S).
 
-/** sintagma_verbal
- *
- * Elimina el primer sintagma verbal encontrado en la oracion.
- *
- * @param Palabras Una lista de palabras que contiene un sintagma verbal.
- * @param Restante La lista restante despues de procesar el sintagma
- * verbal.
- *
- * ==
- * ?- sintagma_verbal([deseo,una,dieta],S).
- * S = [una,dieta].
- * ==
- */
-sintagma_verbal(A,B):- verb(A,B).
+/** prepositional phrase */
+prepositional([en|S],S).
+prepositional([por|S],S).
+prepositional([a|S],S).
+prepositional([de|S],S).  % Handles "bajar de peso" (lose weight)
 
-/** validacion_gramatical
- *
- * Valida si la oracion digitada por el usuario es gramaticalmente
- * correcta.
- *
- * @param Oracion Una lista de palabras que representa la oracion a
- * validar.
- *
- * ==
- * ?- validacion_gramatical([yo,quiero,llevar,una,dieta]).
- * true.
- * ==
- */
+prepositional_phrase([por,semana|S],S).
+prepositional_phrase([a,la,semana|S],S).  % Handles "a la semana"
+prepositional_phrase([en,sangre|S],S).
+prepositional_phrase([de,peso|S],S).
+
+/** number and frequency */
+number([N|S],S) :- atom_number(N,_).  % Recognizes numbers like "5", "3"
+frequency([veces|S],S).
+frequency([dias|S],S).
+frequency([semanas|S],S).
+
+/** oracion */
+oracion(A,B):- sintagma_nominal(A,C), sintagma_verbal(C,B), !.
+oracion(A,B):- sintagma_verbal(A,B), !.
+oracion(A,B):- oracion_compuesta(A,B), !.  % Handles compound sentences
+
+/** compound sentence */
+oracion_compuesta(A,B):- oracion(A,C), [','|C], oracion(C,B).  % Handle sentences with commas (e.g., "hago bastante, al menos 5 veces a la semana")
+
+/** sintagma_nominal */
+sintagma_nominal(A,B):- determinante(A,C), sustantivo_g(C,B).
+sintagma_nominal(A,B):- sustantivo_g(A,B).
+
+/** sintagma_verbal */
+sintagma_verbal(A,B):- verb(A,C), adverb(C,D), sintagma_nominal(D,B).
+sintagma_verbal(A,B):- verb(A,C), modifier(C,D), number(D,E), frequency(E,F), prepositional_phrase(F,B).
+sintagma_verbal(A,B):- verb(A,C), prepositional(C,D), sustantivo_g(D,B).  % Handles "bajar de peso"
+
+/** validacion_gramatical */
 validacion_gramatical(Oracion):- oracion(Oracion,[]), !.
 validacion_gramatical(Oracion):- nl, writeln('Oracion gramaticalmente incorrecta'), writeln('Escriba de nuevo su oracion'), nl, validacion_gramatical(_).
