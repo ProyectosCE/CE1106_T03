@@ -1,6 +1,7 @@
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/http_json)).
+:- set_prolog_flag(encoding, utf8).  % Asegura que todo el sistema use UTF-8
 
 % Importar el chatbot desde el archivo nutribot.pl
 :- consult('nutribot.pl').
@@ -18,7 +19,7 @@ handle_chat_request(Request) :-
     Query = QueryDict.get(query),             % Obtener la consulta desde el JSON
     process_query(Query, Response),           % Procesar la consulta con el chatbot
     format('Content-type: application/json; charset=UTF-8~n~n'),  % Asegurar que la respuesta esté en UTF-8
-    reply_json_dict(_{response: Response}).   % Devolver respuesta en formato JSON UTF-8
+    reply_json_dict(_{response: Response}, [json_object(dict)]).   % Enviar la respuesta correctamente en UTF-8
 
 % Procesar la consulta con el chatbot (nutribot.pl)
 process_query(Input, Response) :-
