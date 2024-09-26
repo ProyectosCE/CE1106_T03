@@ -14,9 +14,9 @@ theme('goodbye', ['adios', 'hasta', 'luego','chao']).
 theme('help_need', ['ayuda', 'sobre', 'peso', 'deseo', 'quiero', 'me', 'gustaria']).
 theme('Dislipidemia',['problema','control','colesterol','Dislipidemia']).
 theme('Hipercolesterolemia',['Hipercolesterolemia','aumento','niveles','colesterol','sangre']).
-theme('actividad_alta', ['mas', '5', 'veces', 'alta', 'frecuente', 'diariamente']).
-theme('actividad_media', ['3', 'veces', 'media', 'moderada','mucho']).
-theme('actividad_baja', ['menos', '3' ,'veces', 'baja', 'poco', 'sedentario','no','hago','ejercicio','casi','nada']).
+theme('avanzado', ['mas', '5', 'veces', 'alta', 'frecuente', 'diariamente']).
+theme('intermedio', ['3', 'veces', 'media', 'moderada','mucho']).
+theme('inicial', ['menos', '3' ,'veces', 'baja', 'poco', 'sedentario','no','hago','ejercicio','casi','nada']).
 theme('saludable',['no','enfermo','saludable','estoy','tengo','ninguna','enfermedad','padezco']).
 theme('proteica', ['proteica', 'alta en proteinas', 'proteínas', 'musculo', 'muscular','alta','en']).
 theme('alcalina', ['alcalina', 'ph', 'equilibrio', 'basica', 'ácido', 'acida']).
@@ -28,6 +28,7 @@ theme('hipercalorica', ['hipercalórica', 'alto en calorías', 'subir de peso', 
 theme('hipocalorica', ['hipocalórica', 'baja en calorías', 'perder peso', 'dieta baja', 'deficit calórico']).
 
 theme('calorias',['calorias','cantidad','diarias','consumir','consumo','diario']).
+thme('no_calorias',['no','calorias','tengo', 'especifico', 'se', 'cuantos']).
 
 % Define responses for themes
 theme_response('welcom', 'Hola, como puedo ayudarte?').
@@ -41,11 +42,12 @@ theme_response('saludable','Me alegro, ¿Tienes pensado una cantidad específica
 
 % Respuestas a calorias
 theme_response('calorias', '¿Eres activo físicamente?').
+theme_response('no_calorias', '¿Eres activo físicamente?').
 
 % Respuestas a actividad fisica
-theme_response('actividad_alta', '¡Genial! Hacer actividad más de 5 veces por semana es excelente para tu salud, ¿Tienes un tipo de dieta te gustaría realizar?').
-theme_response('actividad_media', 'Hacer ejercicio 3 veces por semana es un buen inicio, sigue así. ¿Tienes un tipo de dieta te gustaría realizar?').
-theme_response('actividad_baja', 'Es importante aumentar tu actividad física para mejorar tu salud, intenta hacer ejercicio al menos 3 veces por semana. ¿Tienes un tipo de dieta te gustaría realizar?').
+theme_response('avanzado', '¡Genial! Hacer actividad más de 5 veces por semana es excelente para tu salud, ¿Tienes un tipo de dieta te gustaría realizar?').
+theme_response('intermedio', 'Hacer ejercicio 3 veces por semana es un buen inicio, sigue así. ¿Tienes un tipo de dieta te gustaría realizar?').
+theme_response('inicial', 'Es importante aumentar tu actividad física para mejorar tu salud, intenta hacer ejercicio al menos 3 veces por semana. ¿Tienes un tipo de dieta te gustaría realizar?').
 
 % Respuestas a dietas
 theme_response('proteica', 'Te recomiendo una dieta alta en proteínas para ganar masa muscular y mantener tu energía.').
@@ -98,7 +100,23 @@ store_user_theme(Words) :-
     assert(user("profile", NewProfile)),
     write('Perfil actualizado: '), write(NewProfile), nl.  % Print the updated profile
 
-%C hequeo del perfilde usuario con las dietas
+
+% Extraer el número de calorías de la oración
+extract_calories(Words, Calories) :-
+    append(_, [NumeroAtom, calorias], Words),  % Buscar el número antes de la palabra "calorias"
+    atom_number(NumeroAtom, Calories).
+
+% Guardar calorías en el perfil del usuario
+store_calories(Words) :-
+    extract_calories(Words, Calories),
+    retract(user("profile", Profile)),
+    atom_number(CaloriesAtom, Calories),  % Convertir número en atom para almacenamiento
+    append([CaloriesAtom], Profile, NewProfile),
+    assert(user("profile", NewProfile)),
+    write('Perfil actualizado con calorías: '), write(NewProfile), nl.
+
+
+% Chequeo del perfil de usuario con las dietas
 
 check_diet_compatibility :-
     user("profile", Profile),  % Accede al perfil del usuario
@@ -123,24 +141,28 @@ imprimir_dieta(NombreDieta, MenuFunc) :-
     call(MenuFunc).
 
 % Main interaction loop with grammatical check
-chat :-
-    write('Tu: '),
-    flush_output,
-    read_line_to_string(user_input, InputRaw),
+chat :- 
+    write('Tu: '), 
+    flush_output, 
+    read_line_to_string(user_input, InputRaw), 
     normalize_input(InputRaw, Words),
-    store_user_theme(Words),  % Store the theme in the user's profile and print it
+    store_user_theme(Words),  % Almacenar el tema detectado en el perfil
 
-    (   Words == ['adios']
+    (   Words == ['adios'] 
     ->  write('Chatbot: ¡Hasta luego!'), nl
-    ;   (   validacion_gramatical(Words)  % Valida la gramática antes de continuar
+    ;   (   validacion_gramatical(Words) 
         ->  (   find_matching_theme(Words, Theme)
-            ->  theme_response(Theme, Response),
-                write('Chatbot: '), write(Response), nl,
-                check_diet_compatibility  % Verifica compatibilidad usando el perfil almacenado
+            ->  (   Theme == 'calorias'
+                ->  store_calories(Words),  % Procesar calorías si el tema es 'calorias'
+                    theme_response('calorias', Response),  % Preguntar sobre actividad física después de calorías
+                    write('Chatbot: '), write(Response), nl
+                ;   theme_response(Theme, Response),
+                    write('Chatbot: '), write(Response), nl
+                ),
+                check_diet_compatibility  % Verificar compatibilidad de dietas
             ;   atomic_list_concat(Words, ' ', Input),
                 respond(Input, Response),
-                write('Chatbot: '), write(Response), nl,
-                check_diet_compatibility  % Verifica compatibilidad usando el perfil almacenado
+                write('Chatbot: '), write(Response), nl
             )
         ;   write('Chatbot: Lo siento, tu gramática no es correcta. Por favor intenta de nuevo.'), nl
         ),
