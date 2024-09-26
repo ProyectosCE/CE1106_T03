@@ -4,9 +4,6 @@
 % Declare user/2 as dynamic so it can be modified
 :- dynamic user/2.
 
-% Verificación de temas y respuestas
-dieta('alta en proteina', ["no",'alta','proteica']).
-dieta('vegana',['colesterol alto','media','vegana']).
 
 % Define a dynamic user profile
 user("profile", []).
@@ -30,18 +27,27 @@ theme('detox', ['detox', 'desintoxicante', 'limpieza', 'jugos', 'toxinas', 'limp
 theme('hipercalorica', ['hipercalórica', 'alto en calorías', 'subir de peso', 'aumento', 'energía']).
 theme('hipocalorica', ['hipocalórica', 'baja en calorías', 'perder peso', 'dieta baja', 'deficit calórico']).
 
+theme('calorias',['calorias','cantidad','diarias','consumir','consumo','diario']).
 
 % Define responses for themes
 theme_response('welcom', 'Hola, como puedo ayudarte?').
 theme_response('goodbye', 'hasta la proxima 👋').
 theme_response('help_need', 'Soy tu nutricionista profesional para ayudarte, ¿padeces de alguna enfermedad?').
-theme_response('Dislipidemia','Te recomendaría una dieta baja en grasas, ¿qué tanta actividad física haces?').
-theme_response('Hipercolesterolemia','Te recomendaría una dieta vegana, ¿qué tanta actividad física haces?').
-theme_response('saludable','Me alegro, ¿qué tanta actividad física haces?').
 
-theme_response('actividad_alta', '¡Genial! Hacer actividad más de 5 veces por semana es excelente para tu salud, tienes una dieta en mente?.').
-theme_response('actividad_media', 'Hacer ejercicio 3 veces por semana es un buen inicio, sigue así. tienes una dieta en mente?').
-theme_response('actividad_baja', 'Es importante aumentar tu actividad física para mejorar tu salud, intenta hacer ejercicio al menos 3 veces por semana. tienes una dieta en mente?').
+% Respuestas a enfermedades
+theme_response('Dislipidemia','Te recomendaría una dieta baja en grasas, ¿Tienes pensado una cantidad específica de calorías diarias por consumir?').
+theme_response('Hipercolesterolemia','Te recomendaría una dieta vegana, ¿Tienes pensado una cantidad específica de calorías diarias por consumir? ').
+theme_response('saludable','Me alegro, ¿Tienes pensado una cantidad específica de calorías diarias por consumir? ').
+
+% Respuestas a calorias
+theme_response('calorias', '¿Eres activo físicamente?').
+
+% Respuestas a actividad fisica
+theme_response('actividad_alta', '¡Genial! Hacer actividad más de 5 veces por semana es excelente para tu salud, ¿Tienes un tipo de dieta te gustaría realizar?').
+theme_response('actividad_media', 'Hacer ejercicio 3 veces por semana es un buen inicio, sigue así. ¿Tienes un tipo de dieta te gustaría realizar?').
+theme_response('actividad_baja', 'Es importante aumentar tu actividad física para mejorar tu salud, intenta hacer ejercicio al menos 3 veces por semana. ¿Tienes un tipo de dieta te gustaría realizar?').
+
+% Respuestas a dietas
 theme_response('proteica', 'Te recomiendo una dieta alta en proteínas para ganar masa muscular y mantener tu energía.').
 theme_response('alcalina', 'Una dieta alcalina te ayudará a equilibrar el pH de tu cuerpo. ¿Te gustaría recibir algunas recomendaciones?').
 theme_response('mediterranea', 'La dieta mediterránea es excelente para la salud cardiovascular, con un enfoque en alimentos saludables como aceite de oliva, pescado, y frutas.').
@@ -50,11 +56,6 @@ theme_response('keto', 'La dieta keto es baja en carbohidratos y alta en grasas.
 theme_response('detox', 'Una dieta detox puede ayudar a limpiar tu cuerpo de toxinas. ¿Estás pensando en hacer una desintoxicación con jugos o batidos?').
 theme_response('hipercalorica', 'Una dieta hipercalórica puede ayudarte a ganar peso o energía. Asegúrate de consumir alimentos ricos en nutrientes.').
 theme_response('hipocalorica', 'Una dieta hipocalórica es efectiva para perder peso. ¿Te gustaría recomendaciones para mantenerte en déficit calórico?').
-
-
-
-
-
 
 % Fallback responses to individual inputs
 respond('hola', 'Hola, ¿cómo puedo ayudarte hoy?').
@@ -97,29 +98,75 @@ store_user_theme(Words) :-
     assert(user("profile", NewProfile)),
     write('Perfil actualizado: '), write(NewProfile), nl.  % Print the updated profile
 
+%C hequeo del perfilde usuario con las dietas
+
+check_diet_compatibility :-
+    user("profile", Profile),  % Accede al perfil del usuario
+    findall(Diet, dieta(Diet), Diets),  % Recoge todas las dietas
+    check_diets(Profile, Diets).  % Verifica las dietas con el perfil del usuario
+    
+check_diets(_, []) :- !.
+check_diets(UserKeywords, [Diet|Rest]) :-
+    Diet = [Name | Keywords],  % Separa el nombre de la dieta de sus parámetros
+    count_matches(UserKeywords, Keywords, 0, Count),  % Asegúrate de que la firma sea correcta
+    (Count >= 3 ->
+        write('Menú para la dieta: '), write(Name), nl,
+        % Aquí se llama a imprimir_dieta/2
+        imprimir_dieta(Name, _)  % Llama a imprimir_dieta con el nombre de la dieta
+    ;   true
+    ),
+    check_diets(UserKeywords, Rest).
+
 % Main interaction loop with grammatical check
 chat :-
     write('Tu: '),
     flush_output,
     read_line_to_string(user_input, InputRaw),
     normalize_input(InputRaw, Words),
-    store_user_theme(Words), % Store the theme in the users profile and print it
+    store_user_theme(Words),  % Store the theme in the user's profile and print it
+
     (   Words == ['adios']
     ->  write('Chatbot: ¡Hasta luego!'), nl
     ;   (   validacion_gramatical(Words)  % Valida la gramática antes de continuar
         ->  (   find_matching_theme(Words, Theme)
             ->  theme_response(Theme, Response),
-                write('Chatbot: '), write(Response), nl
+                write('Chatbot: '), write(Response), nl,
+                check_diet_compatibility  % Verifica compatibilidad usando el perfil almacenado
             ;   atomic_list_concat(Words, ' ', Input),
                 respond(Input, Response),
-                write('Chatbot: '), write(Response), nl
+                write('Chatbot: '), write(Response), nl,
+                check_diet_compatibility  % Verifica compatibilidad usando el perfil almacenado
             )
-        ;   true  % Si falla la validación gramatical, se pide nueva entrada
+        ;   write('Chatbot: Lo siento, tu gramática no es correcta. Por favor intenta de nuevo.'), nl
         ),
         chat
     ).
+
+
+imprimir_dieta(NombreDieta, MenuFunc) :-
+    dieta([NombreDieta, _, _, _, _, _, _, _, MenuFunc]),
+    call(MenuFunc).
+
 
 % Entry point
 comienzo :-
     write('Bienvenido al chatbot. Escribe "adios" para terminar.'), nl,
     chat.
+
+
+% Reglas para pruebas
+
+reset_user :-
+    retractall(user("profile", _)), 
+    assert(user("profile", ['proteica', '2000', 'intermedio', 'musculo', 'pérdida', 'grasa'])).  
+
+print_user :-
+    user("profile", Profile),
+    write('Perfil del usuario: '), write(Profile), nl.
+
+check :-
+    reset_user,
+    print_user,
+    check_diet_compatibility.
+
+
