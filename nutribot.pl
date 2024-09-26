@@ -117,6 +117,11 @@ check_diets(UserKeywords, [Diet|Rest]) :-
     ),
     check_diets(UserKeywords, Rest).
 
+
+imprimir_dieta(NombreDieta, MenuFunc) :-
+    dieta([NombreDieta, _, _, _, _, _, _, _, MenuFunc]),
+    call(MenuFunc).
+
 % Main interaction loop with grammatical check
 chat :-
     write('Tu: '),
@@ -142,12 +147,6 @@ chat :-
         chat
     ).
 
-
-imprimir_dieta(NombreDieta, MenuFunc) :-
-    dieta([NombreDieta, _, _, _, _, _, _, _, MenuFunc]),
-    call(MenuFunc).
-
-
 % Entry point
 comienzo :-
     write('Bienvenido al chatbot. Escribe "adios" para terminar.'), nl,
@@ -168,5 +167,3 @@ check :-
     reset_user,
     print_user,
     check_diet_compatibility.
-
-
