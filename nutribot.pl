@@ -17,7 +17,7 @@ theme('Hipercolesterolemia',['Hipercolesterolemia','aumento','niveles','colester
 theme('actividad_alta', ['mas', '5', 'veces', 'alta', 'frecuente', 'diariamente']).
 theme('actividad_media', ['3', 'veces', 'media', 'moderada','mucho']).
 theme('actividad_baja', ['menos', '3' ,'veces', 'baja', 'poco', 'sedentario','no','hago','ejercicio','casi','nada']).
-theme('saludable',['no','enfermo','saludable','estoy']).
+theme('saludable',['no','enfermo','saludable','estoy','tengo','ninguna','enfermedad','padezco']).
 
 % Define responses for themes
 theme_response('welcom', 'Hola, como puedo ayudarte?').
@@ -25,6 +25,7 @@ theme_response('goodbye', 'hasta la proxima 👋').
 theme_response('help_need', 'Soy tu nutricionista profesional para ayudarte, ¿padeces de alguna enfermedad?').
 theme_response('Dislipidemia','Te recomendaría una dieta baja en grasas, ¿qué tanta actividad física haces?').
 theme_response('Hipercolesterolemia','Te recomendaría una dieta vegana, ¿qué tanta actividad física haces?').
+theme_response('saludable','Me alegro, ¿qué tanta actividad física haces?').
 
 theme_response('actividad_alta', '¡Genial! Hacer actividad más de 5 veces por semana es excelente para tu salud.').
 theme_response('actividad_media', 'Hacer ejercicio 3 veces por semana es un buen inicio, sigue así.').
