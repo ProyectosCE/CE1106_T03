@@ -4,7 +4,6 @@
 % Declare user/2 as dynamic so it can be modified
 :- dynamic user/2.
 
-
 % Define a dynamic user profile
 user("profile", []).
 
@@ -28,7 +27,7 @@ theme('hipercalorica', ['hipercalórica', 'alto en calorías', 'subir de peso', 
 theme('hipocalorica', ['hipocalórica', 'baja en calorías', 'perder peso', 'dieta baja', 'deficit calórico']).
 
 theme('calorias',['calorias','cantidad','diarias','consumir','consumo','diario']).
-thme('no_calorias',['no','calorias','tengo', 'especifico', 'se', 'cuantos']).
+theme('no_calorias',['no','calorias','tengo', 'especifico', 'se', 'cuantos']).
 
 % Define responses for themes
 theme_response('welcom', 'Hola, como puedo ayudarte?').
@@ -67,12 +66,6 @@ respond('adios', '¡Hasta luego!').
 
 respond(_, 'Lo siento, no entiendo tu pregunta.').
 
-% Normalize input: convert to lowercase, remove punctuation, and convert words to atoms
-normalize_input(Input, NormalizedWords) :-
-    string_lower(Input, Lowered),
-    split_string(Lowered, " ", ".,!?", Parts),  % Split by spaces and remove punctuation
-    maplist(atom_string, NormalizedWords, Parts).  % Convert strings to atoms for comparison
-
 % Match words with a theme
 match_theme(Words, Theme, Count) :-
     theme(Theme, Keywords),
@@ -103,8 +96,11 @@ store_user_theme(Words) :-
 
 % Extraer el número de calorías de la oración
 extract_calories(Words, Calories) :-
-    append(_, [NumeroAtom, calorias], Words),  % Buscar el número antes de la palabra "calorias"
-    atom_number(NumeroAtom, Calories).
+    append(_, [Numero, calorias], Words),  % Buscar el número antes de la palabra "calorias"
+    (   number(Numero)
+    ->  Calories = Numero  % Si es un número, lo usamos directamente
+    ;   atom_number(Numero, Calories)  % Si es un átomo, lo convertimos a número
+    ).
 
 % Guardar calorías en el perfil del usuario
 store_calories(Words) :-
@@ -140,33 +136,56 @@ imprimir_dieta(NombreDieta, MenuFunc) :-
     dieta([NombreDieta, _, _, _, _, _, _, _, MenuFunc]),
     call(MenuFunc).
 
-% Main interaction loop with grammatical check
+% Main interaction loop with grammatical check (with trace for debugging)
 chat :- 
     write('Tu: '), 
     flush_output, 
     read_line_to_string(user_input, InputRaw), 
     normalize_input(InputRaw, Words),
-    store_user_theme(Words),  % Almacenar el tema detectado en el perfil
+    write('Entrada normalizada: '), writeln(Words),  % Trace to see normalized input
 
     (   Words == ['adios'] 
     ->  write('Chatbot: ¡Hasta luego!'), nl
-    ;   (   validacion_gramatical(Words) 
-        ->  (   find_matching_theme(Words, Theme)
-            ->  (   Theme == 'calorias'
-                ->  store_calories(Words),  % Procesar calorías si el tema es 'calorias'
-                    theme_response('calorias', Response),  % Preguntar sobre actividad física después de calorías
-                    write('Chatbot: '), write(Response), nl
-                ;   theme_response(Theme, Response),
-                    write('Chatbot: '), write(Response), nl
-                ),
-                check_diet_compatibility  % Verificar compatibilidad de dietas
-            ;   atomic_list_concat(Words, ' ', Input),
-                respond(Input, Response),
-                write('Chatbot: '), write(Response), nl
-            )
-        ;   write('Chatbot: Lo siento, tu gramática no es correcta. Por favor intenta de nuevo.'), nl
+    ;   (   validacion_gramatical(Words)  % Verify grammar before proceeding
+        ->  write('Entrada válida, procesando...'), nl,
+            process_chat(Words)  % Separate function to process valid input
+        ;   write('Chatbot: Lo siento, tu gramática no es correcta. Por favor intenta de nuevo.'), nl,
+            chat
+        )
+    ).
+
+% Separate processing logic for valid input
+process_chat(Words) :-
+    store_user_theme(Words),  % Store the detected theme
+    write('Perfil actualizado: '), writeln(Words), nl,
+    (   find_matching_theme(Words, Theme)
+    ->  (   Theme == 'calorias'
+        ->  store_calories(Words),  % Procesar calorías si el tema es 'calorias'
+            theme_response('calorias', Response),
+            write('Chatbot: '), write(Response), nl
+        ;   theme_response(Theme, Response),
+            write('Chatbot: '), write(Response), nl
         ),
-        chat
+        check_diet_compatibility  % Verificar compatibilidad de dietas
+    ;   respond(Words, Response),
+        write('Chatbot: '), write(Response), nl
+    ),
+    chat.
+
+% Normalize input: convert to lowercase, remove punctuation, and convert words to atoms or numbers (with trace)
+normalize_input(Input, NormalizedWords) :-
+    string_lower(Input, Lowered),
+    write('Texto en minúsculas: '), writeln(Lowered),  % Trace for lowercased text
+    split_string(Lowered, " ", ".,!?", Parts),  % Split by spaces and remove punctuation
+    write('Partes del texto: '), writeln(Parts),  % Trace for parts after split
+    maplist(convert_to_atom_or_number, Parts, NormalizedWords).  % Convert to atoms or numbers
+
+% Convert strings to atoms or numbers (with trace)
+convert_to_atom_or_number(Part, Atom) :-
+    (   number_string(Number, Part)
+    ->  Atom = Number  % If the part is a number, keep it as a number
+    ;   atom_string(Atom, Part),  % Otherwise, convert the string to an atom
+        write('Convertido a átomo: '), writeln(Atom)  % Trace for each converted atom
     ).
 
 % Entry point
