@@ -13,6 +13,7 @@ start([buenas]).
 start([adios]).
 start([chao]).
 start([hola,nutribot]).  % Acepta "Hola Nutribot"
+start([saludos]).
 
 /** final */
 final([gracias]).
@@ -54,6 +55,7 @@ sustantivo_g([ayuda|S],S).
 sustantivo_g([calorias|S],S).
 sustantivo_g([sano|S],S).
 sustantivo_g([sana|S],S).
+sustantivo_g([peso|S],S).
 sustantivo_g([nutribot|S],S).  % Reconoce "nutribot"
 sustantivo_g([_,_|S],S).  % Omite sustantivos no reconocidos
 
@@ -70,6 +72,8 @@ verbo([consumir|S],S).
 verbo([he|S],S).
 verbo([pensado|S],S).
 verbo([necesito|S],S).
+verbo([perder|S],S).  % Añadido para reconocer "perder peso"
+verbo([hacer|S],S).  % Añadido para reconocer "hacer una dieta"
 
 /** adverbios */
 adverbio([mucho|S],S).
@@ -101,6 +105,10 @@ oracion(A,B):- sintagma_nominal(A,C), sintagma_verbal(C,B), !.
 oracion(A,B):- sintagma_verbal(A,B), !.
 oracion(A,B):- start(A), B = [].  % Maneja saludos como "hola" o "adios"
 
+/** saludos seguidos de oraciones */
+oracion(A,B):- start(Saludo), append(Saludo, Resto, A), oracion(Resto,B), !.  % Maneja "Hola, quiero perder peso"
+oracion(A,B):- start(Saludo), append(Saludo, Resto, A), pregunta(Resto,B), !.  % Maneja "Hola, me puedes ayudar con mi dieta"
+
 /** negaciones */
 oracion(A,B):- negativo(A,C), sintagma_verbal(C,B), !.
 oracion(A,B):- negativo(A,C), verbo(C,D), preposicional(D,E), sustantivo_g(E,B), !.
@@ -110,6 +118,7 @@ pregunta(A,B):- pronombre_objeto(A,C), verbo(C,D), preposicional(D,E), sintagma_
 pregunta(A,B):- pronombre_objeto(A,C), verbo(C,D), sustantivo_g(D,B), !.
 pregunta(A,B):- verbo_invertido(A,C), sintagma_nominal(C,B), !.
 pregunta(A,B):- verbo_invertido(A,C), sintagma_verbal(C,B), !.
+pregunta(A,B):- verbo_invertido(A,B), !.  % Maneja preguntas sin complemento como "Me puedes ayudar"
 
 /** oraciones compuestas */
 oracion_compuesta(A,B):- oracion(A,C), [','|C], oracion(C,B), !.
@@ -133,7 +142,6 @@ sintagma_verbal(A,B):- verbo(A,C), sintagma_nominal(C,B), !.
 sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sintagma_nominal(D,B), !.  % Maneja "quiero una dieta de 100 calorías"
 sintagma_verbal(A,B):- verbo(A,C), numero(C,D), sustantivo_g(D,B), !.  % Maneja "consumir 100 calorías"
 sintagma_verbal(A,B):- numero(A,C), sustantivo_g(C,B), !.  % Maneja "100 calorías"
-
 
 /** preguntas y órdenes */
 
@@ -159,7 +167,21 @@ verbo_invertido([deberia|S],S).
 verbo_invertido([es|S],S).
 
 /** validación gramatical */
-validacion_gramatical(Oracion):- oracion(Oracion,[]), !.
-validacion_gramatical(Oracion):- pregunta(Oracion,[]), !.
-validacion_gramatical(Oracion):- orden(Oracion,[]), !.
-validacion_gramatical(Oracion):- nl, writeln('Oracion gramaticalmente incorrecta'), writeln('Escriba de nuevo su oracion'), nl, fail.
+
+/** validacion para solo saludo */
+validacion_gramatical(Oracion) :- start(Oracion), writeln('Solo saludo'), !.
+
+/** validacion para saludo con oracion */
+validacion_gramatical(Oracion) :- start(Saludo), append(Saludo, Resto, Oracion), oracion(Resto,[]), writeln('Saludo con oración'), !.
+
+/** validacion para saludo con pregunta */
+validacion_gramatical(Oracion) :- start(Saludo), append(Saludo, Resto, Oracion), pregunta(Resto,[]), writeln('Saludo con pregunta'), !.
+
+/** validacion para pregunta (con o sin complemento) */
+validacion_gramatical(Oracion) :- pregunta(Oracion,[]), writeln('Pregunta'), !.
+
+/** validacion para oraciones afirmativas o negativas */
+validacion_gramatical(Oracion) :- oracion(Oracion,[]), writeln('Oración afirmativa o negativa'), !.
+
+/** validacion generica para el resto de las oraciones */
+validacion_gramatical(Oracion):- nl, writeln('Oración gramaticalmente incorrecta'), writeln('Escriba de nuevo su oración'), nl, fail.
