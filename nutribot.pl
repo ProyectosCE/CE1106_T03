@@ -15,10 +15,10 @@ theme('help_need', ['ayuda', 'sobre', 'peso', 'deseo', 'quiero', 'me', 'gustaria
 theme('Dislipidemia',['problema','control','colesterol','Dislipidemia']).
 theme('Hipercolesterolemia',['Hipercolesterolemia','aumento','niveles','colesterol','sangre']).
 theme('avanzado', ['mas', '5', 'veces', 'alta', 'frecuente', 'diariamente','semana','ejercicio']).
-theme('intermedio', ['3', 'veces', 'media', 'moderada','mucho']).
-theme('inicial', ['menos', '3' ,'veces', 'baja', 'poco', 'sedentario','no','ejercicio','casi','nada']).
+theme('intermedio', ['3', 'veces', 'media', 'moderada','mucho','ejercicio']).
+theme('inicial', ['menos','veces', 'baja', 'poco', 'sedentario','no','ejercicio','casi','nada']).
 theme('saludable',['enfermo','saludable','tengo','ninguna','enfermedad','padezco']).
-theme('proteica', ['proteica', 'alta en proteinas', 'proteínas', 'musculo', 'muscular','alta']).
+theme('proteica', ['proteica', 'alta en proteinas', 'proteínas', 'musculo', 'muscular','alta','dieta']).
 theme('alcalina', ['alcalina', 'ph', 'equilibrio', 'basica', 'ácido', 'acida']).
 theme('mediterranea', ['mediterranea', 'aceite de oliva', 'granos', 'pescado', 'frutas', 'verduras', 'saludable','quiero','dieta']).
 theme('vegetariana', ['vegetariana', 'sin carne', 'vegetal', 'proteínas vegetales', 'frutas', 'verduras']).
@@ -113,23 +113,21 @@ extract_calories(Words, Calories) :-
 
 % Check diet compatibility based on user profile and themes
 check_diet_compatibility :-
-    user("profile", Profile),  % Accede al perfil del usuario
-    findall(Diet, dieta(Diet), Diets),  % Recoge todas las dietas
-    check_diets(Profile, Diets).  % Verifica las dietas con el perfil del usuario
+    user("profile", Profile),  % Access the users profile
+    findall(Diet, dieta(Diet), Diets),  % Retrieve all diets
+    check_diets(Profile, Diets).  % Check diets against the users profile
 
 % Verify each theme/diet based on the users profile
 check_diets(_, []) :- !.
 check_diets(UserKeywords, [Diet|Rest]) :-
-    Diet = [Name | Keywords],  % Separa el nombre de la dieta de sus parámetros
-    count_matches(UserKeywords, Keywords, 0, Count),  % Asegúrate de que la firma sea correcta
-    (Count >= 3 ->
+    Diet = [Name | Keywords],  % Separate the diet name from its parameters
+    count_matches(UserKeywords, Keywords, 0, Count),  % Count matches between profile and diet
+    (Count >= 3 ->  % Lower the threshold to 2 for testing
         write('Menú para la dieta: '), write(Name), nl,
-        % Aquí se llama a imprimir_dieta/2
-        imprimir_dieta(Name, _)  % Llama a imprimir_dieta con el nombre de la dieta
+        imprimir_dieta(Name, _)  % Call to imprimir_dieta
     ;   true
     ),
     check_diets(UserKeywords, Rest).
-
 
 imprimir_dieta(NombreDieta, MenuFunc) :-
     dieta([NombreDieta, _, _, _, _, _, _, _, MenuFunc]),
