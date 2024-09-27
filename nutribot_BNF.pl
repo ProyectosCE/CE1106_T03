@@ -62,6 +62,7 @@ sustantivo_g([_,_|S],S).  % Omite sustantivos no reconocidos
 /** verbos */
 verbo([tengo|S],S).
 verbo([puede|S],S).
+verbo([puedes|S],S).  % Acepta "puedes"
 verbo([ayudar|S],S).
 verbo([ayudas|S],S).
 verbo([estoy|S],S).
@@ -114,6 +115,7 @@ oracion(A,B):- negativo(A,C), sintagma_verbal(C,B), !.
 oracion(A,B):- negativo(A,C), verbo(C,D), preposicional(D,E), sustantivo_g(E,B), !.
 
 /** preguntas */
+pregunta(A,B):- pronombre_objeto(A,C), verbo(C,D), verbo(D,B), !.  % Maneja "me puedes ayudar"
 pregunta(A,B):- pronombre_objeto(A,C), verbo(C,D), preposicional(D,E), sintagma_nominal(E,B), !.
 pregunta(A,B):- pronombre_objeto(A,C), verbo(C,D), sustantivo_g(D,B), !.
 pregunta(A,B):- verbo_invertido(A,C), sintagma_nominal(C,B), !.
