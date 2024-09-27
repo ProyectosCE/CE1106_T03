@@ -20,7 +20,7 @@ theme('inicial', ['menos', '3' ,'veces', 'baja', 'poco', 'sedentario','no','ejer
 theme('saludable',['enfermo','saludable','tengo','ninguna','enfermedad','padezco']).
 theme('proteica', ['proteica', 'alta en proteinas', 'proteínas', 'musculo', 'muscular','alta']).
 theme('alcalina', ['alcalina', 'ph', 'equilibrio', 'basica', 'ácido', 'acida']).
-theme('mediterranea', ['mediterranea', 'aceite de oliva', 'granos', 'pescado', 'frutas', 'verduras', 'saludable','quiero','dieta']).
+theme('mediterranea', ['mediterránea', 'aceite de oliva', 'granos', 'pescado', 'frutas', 'verduras', 'saludable','quiero','dieta']).
 theme('vegetariana', ['vegetariana', 'sin carne', 'vegetal', 'proteínas vegetales', 'frutas', 'verduras']).
 theme('keto', ['keto', 'cetogénica', 'baja en carbohidratos', 'grasas', 'cetonas']).
 theme('detox', ['detox', 'desintoxicante', 'limpieza', 'jugos', 'toxinas', 'limpiar']).
@@ -135,6 +135,7 @@ imprimir_dieta(NombreDieta, MenuFunc) :-
     dieta([NombreDieta, _, _, _, _, _, _, _, MenuFunc]),
     call(MenuFunc).
 
+
 % Main interaction loop
 chat :- 
     write('Tu: '), 
@@ -150,11 +151,9 @@ chat :-
             ->  (   Theme == 'calorias'
                 ->  store_calories(Words),  % Procesar calorías si el tema es 'calorias'
                     theme_response('calorias', Response),  % Preguntar sobre actividad física después de calorías
-                    check_diet_compatibility,
                     write('Chatbot: '), write(Response), nl
                 ;   theme_response(Theme, Response),
                     write('Chatbot: '), write(Response), nl
-                    
                 ),
                 check_diet_compatibility  % Verificar compatibilidad de dietas
             ;   atomic_list_concat(Words, ' ', Input),
@@ -176,7 +175,7 @@ comienzo :-
 
 reset_user :-
     retractall(user("profile", _)), 
-    assert(user("profile", ['mediterranea','avanzado','3000','calorias','saludable','help_need'])).  
+    assert(user("profile", ['proteica', '2000', 'intermedio', 'musculo', 'pérdida', 'grasa'])).  
 
 print_user :-
     user("profile", Profile),
