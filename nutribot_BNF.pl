@@ -3,12 +3,16 @@
 :-style_check(-singleton).
 :- set_prolog_flag(double_quotes, chars).
 
-/** start */
+:- discontiguous oracion/2.
+:- discontiguous pregunta/2.
+
+/** start (Interjecciones y saludos) */
 start([hola]).
-start([iniciar]).
+start([gracias]).
 start([buenas]).
-start([buenos]).
-start([nutritec]).
+start([adios]).
+start([chao]).
+start([hola,nutribot]).
 
 /** final */
 final([gracias]).
@@ -16,103 +20,183 @@ final([muchas,gracias]).
 final([chao]).
 final([adios]).
 
-/** negative */
-negative([no|S],S).
-negative([nunca|S],S).
-negative([jamas|S],S).
-negative([nada|S],S).
+/** negaciones */
+negativo([no|S],S).
+negativo([nunca|S],S).
+negativo([jamas|S],S).
+negativo([nada|S],S).
 
-/** positive */
-positive([si|S],S).
-positive([claro|S],S).
-positive([por,supuesto|S],S).
-positive([definitivamente|S],S).
+/** afirmaciones */
+afirmativo([si|S],S).
+afirmativo([claro|S],S).
+afirmativo([por,supuesto|S],S).
+afirmativo([definitivamente|S],S).
 
-/** determinante */
+/** determinantes */
 determinante([yo|S],S).
-determinante([el|S],S).
-determinante([la|S],S).
-determinante([los|S],S).
-determinante([las|S],S).
-determinante([mi|S],S).
 determinante([tu|S],S).
-determinante([su|S],S).
+determinante([el|S],S).
+determinante([ella|S],S).
+determinante([ellos|S],S).
+determinante([nosotros|S],S).
 determinante([un|S],S).
 determinante([una|S],S).
+determinante([unas|S],S).
+determinante([unos|S],S).
+determinante([mi|S],S).
+determinante([las|S],S).
+determinante([los|S],S).
 
-/** sustantivo_g */
-sustantivo_g([colesterol|S],S).
-sustantivo_g([sangre|S],S).
+/** sustantivos generales */
+sustantivo_g([sobrepeso|S],S).
+sustantivo_g([enfermedades|S],S).
+sustantivo_g([salud|S],S).
+sustantivo_g([dieta|S],S).
+sustantivo_g([ayuda|S],S).
+sustantivo_g([calorias|S],S).
+sustantivo_g([sano|S],S).
+sustantivo_g([sana|S],S).
+sustantivo_g([peso|S],S).
+sustantivo_g([nutribot|S],S).
 sustantivo_g([ejercicio|S],S).
 sustantivo_g([problemas|S],S).
-sustantivo_g([persona|S],S).
-sustantivo_g([dieta|S],S).
-sustantivo_g([salud|S],S).
-sustantivo_g([peso|S],S).
-sustantivo_g([alimentacion|S],S).
-sustantivo_g([vida|S],S).
-sustantivo_g([_,_|S],S).  % Skips over unrecognized nouns
+sustantivo_g([control|S],S).
+sustantivo_g([colesterol|S],S).
+sustantivo_g([_,_|S],S).
 
-/** verb */
-verb([deseo|S],S).
-verb([tengo|S],S).
-verb([gustaria|S],S).
-verb([perder|S],S).
-verb([bajar|S],S).  % Handles 'bajar de peso'
-verb([controlando|S],S).
-verb([controlo|S],S).
-verb([hago|S],S).
-verb([realizo|S],S).
-verb([practico|S],S).
-verb([estas|S],S).  % Handles "como estas"
-verb([_,_|S],S).
+/** verbos */
+verbo([tengo|S],S).
+verbo([puede|S],S).
+verbo([ayudar|S],S).
+verbo([ayudas|S],S).
+verbo([estoy|S],S).
+verbo([es|S],S).
+verbo([deberia|S],S).
+verbo([quiero|S],S).
+verbo([consumir|S],S).
+verbo([he|S],S).
+verbo([pensado|S],S).
+verbo([necesito|S],S).
+verbo([perder|S],S).
+verbo([hago|S],S).
+verbo([bajar|S],S). 
+verbo([gustaria|S],S). 
+verbo([quiero,bajar|S],S). 
+verbo([controlando|S],S).  
 
-/** adverbs */
-adverb([bastante|S],S).  % Handles "bastante" (quite)
-adverb([mucho|S],S).     % Handles "mucho" (a lot)
-adverb([poco|S],S).      % Handles "poco" (a little)
-adverb(S,S).             % Allows flexibility if no adverb is present
+/** adverbios */
+adverbio([mucho|S],S).
+adverbio([poco|S],S).
+adverbio(S,S).
 
-/** prepositional phrases and modifiers */
-modifier([al,menos|S],S).  % Handles "al menos"
-modifier([mas,de|S],S).     % Handles "más de"
-modifier([menos,de|S],S).   % Handles "menos de"
-modifier(S,S).
+/** frases preposicionales y modificadores */
+modificador([al,menos|S],S).
+modificador([mas,de|S],S).
+modificador([menos,de|S],S).
+modificador(S,S).
 
-/** prepositional phrase */
-prepositional([en|S],S).
-prepositional([por|S],S).
-prepositional([a|S],S).
-prepositional([de|S],S).  % Handles "bajar de peso" (lose weight)
+/** frases preposicionales */
+preposicional([en|S],S).
+preposicional([por|S],S).
+preposicional([a|S],S).
+preposicional([de|S],S).
+preposicional([de,peso|S],S).  /** Added "de peso" **/
+preposicional([con|S],S).
+preposicional([del|S],S).  % Handling "del" (de + el)
+preposicional([con|S], S).   % "con" as preposition
+preposicional([del|S], S).   % "del" (de + el)
+preposicional([con,el|S],S). % Handle "con el"
+preposicional([con,la|S],S). % Handle "con el"
+preposicional([con,una|S],S). % Handle "con el"
+preposicional([con,un|S],S). % Handle "con el"
+preposicional([del,colesterol|S],S). % Handle "del colesterol"
 
-prepositional_phrase([por,semana|S],S).
-prepositional_phrase([a,la,semana|S],S).  % Handles "a la semana"
-prepositional_phrase([en,sangre|S],S).
-prepositional_phrase([de,peso|S],S).
+/** números y frecuencias */
+numero([N|S],S) :- number(N), !.
+numero([N|S],S) :- atom_number(N, _), !. % Allow for atomic representation of numbers.
+frecuencia([veces|S],S).
+frecuencia([dias|S],S).
+frecuencia([semanas|S],S).
+frec([_,_|S],S).
 
-/** number and frequency */
-number([N|S],S) :- atom_number(N,_).  % Recognizes numbers like "5", "3"
-frequency([veces|S],S).
-frequency([dias|S],S).
-frequency([semanas|S],S).
-
-/** oracion */
+/** manejo de oraciones */
 oracion(A,B):- sintagma_nominal(A,C), sintagma_verbal(C,B), !.
 oracion(A,B):- sintagma_verbal(A,B), !.
-oracion(A,B):- oracion_compuesta(A,B), !.  % Handles compound sentences
+oracion(A,B):- start(A), B = [].
 
-/** compound sentence */
-oracion_compuesta(A,B):- oracion(A,C), [','|C], oracion(C,B).  % Handle sentences with commas (e.g., "hago bastante, al menos 5 veces a la semana")
+/** negaciones */
+oracion(A,B):- negativo(A,C), sintagma_verbal(C,B), !.
+oracion(A,B):- negativo(A,C), verbo(C,D), preposicional(D,E), sustantivo_g(E,B), !.
 
-/** sintagma_nominal */
-sintagma_nominal(A,B):- determinante(A,C), sustantivo_g(C,B).
-sintagma_nominal(A,B):- sustantivo_g(A,B).
+/** preguntas */
+pregunta(A,B):- pronombre_objeto(A,C), verbo(C,D), preposicional(D,E), sintagma_nominal(E,B), !.
+pregunta(A,B):- pronombre_objeto(A,C), verbo(C,D), sustantivo_g(D,B), !.
+pregunta(A,B):- verbo_invertido(A,C), sintagma_nominal(C,B), !.
+pregunta(A,B):- verbo_invertido(A,C), sintagma_verbal(C,B), !.
 
-/** sintagma_verbal */
-sintagma_verbal(A,B):- verb(A,C), adverb(C,D), sintagma_nominal(D,B).
-sintagma_verbal(A,B):- verb(A,C), modifier(C,D), number(D,E), frequency(E,F), prepositional_phrase(F,B).
-sintagma_verbal(A,B):- verb(A,C), prepositional(C,D), sustantivo_g(D,B).  % Handles "bajar de peso"
+/** oraciones compuestas */
+oracion_compuesta(A,B):- oracion(A,C), [','|C], oracion(C,B), !.
+oracion_compuesta(A,B):- oracion_simple(A,B), !.
 
-/** validacion_gramatical */
-validacion_gramatical(Oracion):- oracion(Oracion,[]), !.
-validacion_gramatical(Oracion):- nl, writeln('Oracion gramaticalmente incorrecta'), writeln('Escriba de nuevo su oracion'), nl, validacion_gramatical(_).
+
+gerundio([controlando|S],S).
+
+/** oraciones simples */
+oracion_simple([], []).
+oracion_simple([Word|S],S) :- sustantivo_g([Word|S],S), !.
+oracion_simple([Word|S],S) :- verbo([Word|S],S), !.
+oracion_simple([Word|S],S) :- preposicional([Word|S],S), !.
+oracion_simple([Word|S],S) :- numero([Word|S],S), !.
+
+
+/** sintagmas nominales */
+sintagma_nominal(A,B):- determinante(A,C), sustantivo_g(C,B), !.
+sintagma_nominal(A,B):- sustantivo_g(A,B), !.
+sintagma_nominal(A,B):- numero(A,C), sustantivo_g(C,B), !.
+sintagma_nominal(A,B):- numero(A,C), preposicional(C,D), sustantivo_g(D,B), !.
+sintagma_nominal(A,B):- determinante(A,C), sustantivo_g(C,D), preposicional(D,E), sustantivo_g(E,B), !.
+sintagma_nominal(A,B):- determinante(A,C), sustantivo_g(C,B), !. 
+sintagma_nominal(A,B):- preposicional(A,C), determinante(C,D), sustantivo_g(D,B), !. /** Nueva regla **/
+/** sintagmas verbales */
+sintagma_verbal(A,B):- verbo(A,C), sintagma_nominal(C,B), !.
+sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sintagma_nominal(D,B), !.
+sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sustantivo_g(D,B), !.  /** Added this rule for "bajar de peso" **/
+sintagma_verbal(A,B):- verbo(A,C), numero(C,D), sustantivo_g(D,B), !.  /** Support for numbers after verbs **/
+sintagma_verbal(A,B):- verbo(A,C), numero(C,D), sustantivo_g(D,B), !.
+sintagma_verbal(A,B):- numero(A,C), sustantivo_g(C,B), !.
+sintagma_verbal(A,B):- verbo(A,C), sustantivo_g(C,D), frecuencia(D,B), !.
+sintagma_verbal(A,B):- verbo(A,C), sustantivo_g(C,D), numero(D,E), frecuencia(E,F), preposicional(F,G), sustantivo_g(G,B), !.
+sintagma_verbal(A,B):- verbo(A,C), sintagma_nominal(C,B), !.
+sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sintagma_nominal(D,B), !.
+sintagma_verbal(A,B):- gerundio(A,C), sintagma_nominal(C,B), !.  /** Added rule for gerund followed by noun **/
+sintagma_verbal(A,B):- verbo(A,C), sustantivo_g(C,D), preposicional(D,E), sustantivo_g(E,B), !.  /** Added rule for "verbo, sustantivo, preposicional, sustantivo" **/
+sintagma_verbal(A,B):- verbo(A,C), sintagma_nominal(C,B), !.
+sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sintagma_nominal(D,B), !.
+sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), determinante(D,E), sustantivo_g(E,B), !. /** Nueva regla **/
+/** preguntas y órdenes */
+pregunta(A,B):- pronombre_objeto(A,C), verbo_invertido(C,D), sintagma_verbal(D,B), !.
+pregunta(A,B):- verbo_invertido(A,C), sintagma_nominal(C,B), !.
+pregunta(A,B):- verbo_invertido(A,C), preposicional(C,D), sustantivo_g(D,B), !.
+pregunta(A,B):- verbo_invertido(A,C), verbo(C,D), sustantivo_g(D,B), !.
+
+/** pronombres para preguntas */
+pronombre_objeto([me|S],S).
+pronombre_objeto([te|S],S).
+
+/** órdenes */
+imperativo([come|S],S).
+imperativo([evita|S],S).
+
+orden(A,B):- imperativo(A,C), sintagma_nominal(C,B), !.
+
+/** verbos invertidos para preguntas */
+verbo_invertido([puedes|S],S).
+verbo_invertido([deberia|S],S).
+verbo_invertido([es|S],S).
+
+/** validación gramatical */
+/** validación gramatical con parámetro de salida */
+validacion_gramatical(Oracion, 'valido') :- oracion(Oracion, []), !.
+validacion_gramatical(Oracion, 'valido') :- pregunta(Oracion, []), !.
+validacion_gramatical(Oracion, 'valido') :- orden(Oracion, []), !.
+validacion_gramatical(_, 'Oración gramaticalmente incorrecta') :- !.
