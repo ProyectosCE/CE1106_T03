@@ -7,8 +7,8 @@ user("profile", []).
 
 theme('welcom', ['hola', 'como', 'estas', 'buenas', 'holi','holap','uwu']).
 theme('goodbye', ['adios', 'hasta', 'luego','chao']).
-theme('help_need', ['ayuda', 'sobre', 'peso', 'deseo', 'quiero', 'me', 'gustaria']).
-theme('Dislipidemia',['problema','control','colesterol','Dislipidemia']).
+theme('help_need', ['ayuda', 'sobre', 'peso', 'deseo', 'quiero', 'me', 'gustaria','perder','bajar','sobre','peso']).
+theme('Dislipidemia',['problema','control','colesterol','Dislipidemia','tengo','controlando']).
 theme('Hipercolesterolemia',['Hipercolesterolemia','aumento','niveles','colesterol','sangre']).
 theme('avanzado', ['mas', '5', 'veces', 'alta', 'frecuente', 'diariamente','semana','ejercicio']).
 theme('intermedio', ['3', 'veces', 'media', 'moderada','mucho','ejercicio']).
@@ -17,11 +17,11 @@ theme('saludable',['enfermo','saludable','tengo','ninguna','enfermedad','padezco
 theme('proteica', ['proteica', 'alta en proteinas', 'proteínas', 'musculo', 'muscular','alta','dieta']).
 theme('alcalina', ['alcalina', 'ph', 'equilibrio', 'basica', 'ácido', 'acida']).
 theme('mediterranea', ['mediterranea', 'aceite de oliva', 'granos', 'pescado', 'frutas', 'verduras', 'saludable','quiero','dieta']).
-theme('vegetariana', ['vegetariana', 'sin carne', 'vegetal', 'proteínas vegetales', 'frutas', 'verduras']).
+theme('vegetariana', ['vegetariana', 'sin', 'carne', 'vegetal', 'proteínas', 'vegetales', 'frutas', 'verduras','dieta','quiero']).
 theme('keto', ['keto', 'cetogénica', 'baja en carbohidratos', 'grasas', 'cetonas']).
 theme('detox', ['detox', 'desintoxicante', 'limpieza', 'jugos', 'toxinas', 'limpiar']).
-theme('hipercalorica', ['hipercalórica', 'alto en calorías', 'subir de peso', 'aumento', 'energía']).
-theme('hipocalorica', ['hipocalórica', 'baja en calorías', 'perder peso', 'dieta baja', 'deficit calórico']).
+theme('hipercalorica', ['hipercalórica', 'alto',  'calorias', 'subir', 'peso', 'aumento', 'energía']).
+theme('hipocalorica', ['hipocalórica', 'baja', 'calorías', 'perder', 'peso', 'dieta baja', 'deficit', 'calórico']).
 theme('calorias',['calorias','cantidad','diarias','consumir','consumo','diario']).
 
 theme_response('welcom', 'Hola, como puedo ayudarte?').
@@ -115,7 +115,7 @@ chat :-
     normalize_input(InputRaw, Words),
 
     (   Words == ['adios'] 
-    ->  write('Chatbot: ¡Hasta luego!'), nl
+    ->  write('Chatbot: ¡Hasta luego!'), nl, comienzo
     ;   validacion_gramatical(Words, Resultado),
         (   (Resultado == 'valido')
         ->  store_user_theme(Words),  

@@ -41,6 +41,8 @@ determinante([ellos|S],S).
 determinante([nosotros|S],S).
 determinante([un|S],S).
 determinante([una|S],S).
+determinante([unas|S],S).
+determinante([unos|S],S).
 determinante([mi|S],S).
 determinante([las|S],S).
 determinante([los|S],S).
@@ -57,6 +59,9 @@ sustantivo_g([sana|S],S).
 sustantivo_g([peso|S],S).
 sustantivo_g([nutribot|S],S).
 sustantivo_g([ejercicio|S],S).
+sustantivo_g([problemas|S],S).
+sustantivo_g([control|S],S).
+sustantivo_g([colesterol|S],S).
 sustantivo_g([_,_|S],S).
 
 /** verbos */
@@ -74,9 +79,11 @@ verbo([pensado|S],S).
 verbo([necesito|S],S).
 verbo([perder|S],S).
 verbo([hago|S],S).
-verbo([bajar|S],S).  /** Added "bajar" **/
-verbo([gustaria|S],S).  /** Added "bajar" **/
-verbo([quiero,bajar|S],S).  /** Added "bajar" **/
+verbo([bajar|S],S). 
+verbo([gustaria|S],S). 
+verbo([quiero,bajar|S],S). 
+verbo([controlando|S],S).  
+
 /** adverbios */
 adverbio([mucho|S],S).
 adverbio([poco|S],S).
@@ -94,6 +101,15 @@ preposicional([por|S],S).
 preposicional([a|S],S).
 preposicional([de|S],S).
 preposicional([de,peso|S],S).  /** Added "de peso" **/
+preposicional([con|S],S).
+preposicional([del|S],S).  % Handling "del" (de + el)
+preposicional([con|S], S).   % "con" as preposition
+preposicional([del|S], S).   % "del" (de + el)
+preposicional([con,el|S],S). % Handle "con el"
+preposicional([con,la|S],S). % Handle "con el"
+preposicional([con,una|S],S). % Handle "con el"
+preposicional([con,un|S],S). % Handle "con el"
+preposicional([del,colesterol|S],S). % Handle "del colesterol"
 
 /** números y frecuencias */
 numero([N|S],S) :- number(N), !.
@@ -122,6 +138,9 @@ pregunta(A,B):- verbo_invertido(A,C), sintagma_verbal(C,B), !.
 oracion_compuesta(A,B):- oracion(A,C), [','|C], oracion(C,B), !.
 oracion_compuesta(A,B):- oracion_simple(A,B), !.
 
+
+gerundio([controlando|S],S).
+
 /** oraciones simples */
 oracion_simple([], []).
 oracion_simple([Word|S],S) :- sustantivo_g([Word|S],S), !.
@@ -129,12 +148,15 @@ oracion_simple([Word|S],S) :- verbo([Word|S],S), !.
 oracion_simple([Word|S],S) :- preposicional([Word|S],S), !.
 oracion_simple([Word|S],S) :- numero([Word|S],S), !.
 
+
 /** sintagmas nominales */
 sintagma_nominal(A,B):- determinante(A,C), sustantivo_g(C,B), !.
 sintagma_nominal(A,B):- sustantivo_g(A,B), !.
 sintagma_nominal(A,B):- numero(A,C), sustantivo_g(C,B), !.
 sintagma_nominal(A,B):- numero(A,C), preposicional(C,D), sustantivo_g(D,B), !.
-
+sintagma_nominal(A,B):- determinante(A,C), sustantivo_g(C,D), preposicional(D,E), sustantivo_g(E,B), !.
+sintagma_nominal(A,B):- determinante(A,C), sustantivo_g(C,B), !. 
+sintagma_nominal(A,B):- preposicional(A,C), determinante(C,D), sustantivo_g(D,B), !. /** Nueva regla **/
 /** sintagmas verbales */
 sintagma_verbal(A,B):- verbo(A,C), sintagma_nominal(C,B), !.
 sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sintagma_nominal(D,B), !.
@@ -144,7 +166,13 @@ sintagma_verbal(A,B):- verbo(A,C), numero(C,D), sustantivo_g(D,B), !.
 sintagma_verbal(A,B):- numero(A,C), sustantivo_g(C,B), !.
 sintagma_verbal(A,B):- verbo(A,C), sustantivo_g(C,D), frecuencia(D,B), !.
 sintagma_verbal(A,B):- verbo(A,C), sustantivo_g(C,D), numero(D,E), frecuencia(E,F), preposicional(F,G), sustantivo_g(G,B), !.
-
+sintagma_verbal(A,B):- verbo(A,C), sintagma_nominal(C,B), !.
+sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sintagma_nominal(D,B), !.
+sintagma_verbal(A,B):- gerundio(A,C), sintagma_nominal(C,B), !.  /** Added rule for gerund followed by noun **/
+sintagma_verbal(A,B):- verbo(A,C), sustantivo_g(C,D), preposicional(D,E), sustantivo_g(E,B), !.  /** Added rule for "verbo, sustantivo, preposicional, sustantivo" **/
+sintagma_verbal(A,B):- verbo(A,C), sintagma_nominal(C,B), !.
+sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sintagma_nominal(D,B), !.
+sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), determinante(D,E), sustantivo_g(E,B), !. /** Nueva regla **/
 /** preguntas y órdenes */
 pregunta(A,B):- pronombre_objeto(A,C), verbo_invertido(C,D), sintagma_verbal(D,B), !.
 pregunta(A,B):- verbo_invertido(A,C), sintagma_nominal(C,B), !.
