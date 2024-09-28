@@ -80,15 +80,13 @@ store_user_theme(Words) :-
     find_best_matching_theme(Words, Theme),
     retract(user("profile", Profile)),
     append([Theme], Profile, NewProfile),
-    assert(user("profile", NewProfile)),
-    write('Perfil actualizado: '), write(NewProfile), nl.
+    assert(user("profile", NewProfile)).
 
 store_calories(Words) :-
     extract_calories(Words, Calories),
     retract(user("profile", Profile)),
     append([Calories], Profile, NewProfile),
-    assert(user("profile", NewProfile)),
-    write('Perfil actualizado con calorías: '), write(NewProfile), nl.
+    assert(user("profile", NewProfile)).
 
 extract_calories(Words, Calories) :-
     append(_, [NumeroAtom, calorias], Words),
