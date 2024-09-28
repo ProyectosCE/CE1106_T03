@@ -166,7 +166,7 @@ verbo_invertido([es|S],S).
 
 /** validación gramatical */
 /** validación gramatical con parámetro de salida */
-validacion_gramatical(Oracion, 'válida') :- oracion(Oracion, []), !.
-validacion_gramatical(Oracion, 'válida') :- pregunta(Oracion, []), !.
-validacion_gramatical(Oracion, 'válida') :- orden(Oracion, []), !.
+validacion_gramatical(Oracion, 'valido') :- oracion(Oracion, []), !.
+validacion_gramatical(Oracion, 'valido') :- pregunta(Oracion, []), !.
+validacion_gramatical(Oracion, 'valido') :- orden(Oracion, []), !.
 validacion_gramatical(_, 'Oración gramaticalmente incorrecta') :- !.

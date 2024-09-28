@@ -143,7 +143,7 @@ chat :-
     (   Words == ['adios'] 
     ->  write('Chatbot: ¡Hasta luego!'), nl
     ;   validacion_gramatical(Words, Resultado),  % Obtener resultado de la validación gramatical
-        (   (Resultado == 'válida')
+        (   (Resultado == 'valido')
         ->  % Si la gramática es válida, procesar
             store_user_theme(Words),  
             (   find_best_matching_theme(Words, Theme)
@@ -178,8 +178,10 @@ comienzo :-
 % Reglas para pruebas
 
 reset_user :-
-    retractall(user("profile", _)), 
-    assert(user("profile", ['mediterranea','avanzado','3000','calorias','saludable','help_need'])).  
+    retractall(user("profile", _)).
+
+set_default_user :-
+    assert(user("profile", ['mediterranea','avanzado','3000','calorias','saludable','help_need'])). 
 
 print_user :-
     user("profile", Profile),
@@ -187,6 +189,7 @@ print_user :-
 
 check :-
     reset_user,
+    set_default_user,
     print_user,
     check_diet_compatibility.
 

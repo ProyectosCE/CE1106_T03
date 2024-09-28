@@ -77,15 +77,17 @@ cors_enable :-
  */
 process_query(Input, Response) :-
     normalize_input(Input, Words),  % Normalizar la consulta
-    validacion_gramatical(Words, Resultado),  % Obtener el resultado de la validación gramatical
-    (   (Resultado == 'válida')
-    ->  % Si la gramática es válida, procesar la consulta
-        (   find_best_matching_theme(Words, Theme)
-        ->  theme_response(Theme, Response)  % Responder basándose en el tema encontrado
-        ;   % Si no se encuentra un tema específico, usar el respond/2 como fallback
+    validacion_gramatical(Words, Resultado),  % Validar gramaticalmente
+    (   Resultado == 'valido'  % Si la gramática es válida
+    ->  (   find_best_matching_theme(Words, Theme)  % Buscar el mejor tema
+        ->  theme_response(Theme, ThemeResponse),
+            % Usar la respuesta del tema y el resultado de la dieta en la respuesta final
+            Response = ThemeResponse
+        ;   % Si no se encuentra un tema específico, usar el fallback respond/2
             atomic_list_concat(Words, ' ', InputStr),
-            respond(InputStr, Response)  % Generar la respuesta basada en la entrada
+            respond(InputStr, FallbackResponse),
+            Response = FallbackResponse
         )
-    ;   % Si la gramática es incorrecta, devolver el mensaje de error
+    ;   % Si la gramática no es válida, devolver un mensaje de error genérico
         Response = Resultado
     ).
