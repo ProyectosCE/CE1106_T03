@@ -54,7 +54,6 @@ sustantivo_g([salud|S],S).
 sustantivo_g([dieta|S],S).
 sustantivo_g([ayuda|S],S).
 sustantivo_g([calorias|S],S).
-sustantivo_g([calorías|S],S).
 sustantivo_g([sano|S],S).
 sustantivo_g([sana|S],S).
 sustantivo_g([peso|S],S).

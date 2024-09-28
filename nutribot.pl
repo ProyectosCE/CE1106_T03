@@ -12,7 +12,7 @@ theme('Dislipidemia',['problema','control','colesterol','Dislipidemia','tengo','
 theme('Hipercolesterolemia',['Hipercolesterolemia','aumento','niveles','colesterol','sangre']).
 theme('avanzado', ['mas', '5', 'veces', 'alta', 'frecuente', 'diariamente','semana','ejercicio']).
 theme('intermedio', ['3', 'veces', 'media', 'moderada','mucho','ejercicio']).
-theme('inicial', ['menos','veces', 'baja', 'poco', 'sedentario','no','ejercicio','casi','nada']).
+theme('inicial', ['menos','veces', 'baja', 'poco', 'sedentario','no','ejercicio','casi','nada','hago']).
 theme('saludable',['enfermo','saludable','tengo','ninguna','enfermedad','padezco']).
 theme('proteica', ['proteica', 'alta en proteinas', 'proteínas', 'musculo', 'muscular','alta','dieta']).
 theme('alcalina', ['alcalina', 'ph', 'equilibrio', 'basica', 'ácido', 'acida']).
@@ -22,7 +22,7 @@ theme('keto', ['keto', 'cetogénica', 'baja en carbohidratos', 'grasas', 'cetona
 theme('detox', ['detox', 'desintoxicante', 'limpieza', 'jugos', 'toxinas', 'limpiar']).
 theme('hipercalorica', ['hipercalórica', 'alto',  'calorias', 'subir', 'peso', 'aumento', 'energía']).
 theme('hipocalorica', ['hipocalórica', 'baja', 'calorías', 'perder', 'peso', 'dieta baja', 'deficit', 'calórico']).
-theme('calorias',['calorias','cantidad','diarias','consumir','consumo','diario']).
+theme('calorias',['calorias','cantidad','diarias','consumir','consumo','diario','calorías','quiero']).
 
 theme_response('welcom', 'Hola, como puedo ayudarte?').
 theme_response('goodbye', 'hasta la proxima 👋').
@@ -80,13 +80,13 @@ store_user_theme(Words) :-
     find_best_matching_theme(Words, Theme),
     retract(user("profile", Profile)),
     append([Theme], Profile, NewProfile),
-    assert(user("profile", NewProfile)).
+    assert(user("profile", NewProfile)), write(NewProfile), nl.
 
 store_calories(Words) :-
     extract_calories(Words, Calories),
     retract(user("profile", Profile)),
     append([Calories], Profile, NewProfile),
-    assert(user("profile", NewProfile)).
+    assert(user("profile", NewProfile)), write(NewProfile), nl.
 
 extract_calories(Words, Calories) :-
     append(_, [NumeroAtom, calorias], Words),
@@ -115,7 +115,7 @@ chat :-
     normalize_input(InputRaw, Words),
 
     (   Words == ['adios'] 
-    ->  write('Chatbot: ¡Hasta luego!'), nl, comienzo
+    ->  write('Chatbot: ¡Hasta luego!'), nl, reset_user, comienzo
     ;   validacion_gramatical(Words, Resultado),
         (   (Resultado == 'valido')
         ->  store_user_theme(Words),  
@@ -156,10 +156,11 @@ comienzo :-
     chat.
 
 reset_user :-
-    retractall(user("profile", _)).
+    retractall(user("profile", _)),  % Remove any existing user profile
+    set_default_user.  % Reinitialize the default user profile to an empty list
 
 set_default_user :-
-    assert(user("profile", ['mediterranea','avanzado','3000','calorias','saludable','help_need'])).
+    assert(user("profile", [])).
 
 print_user :-
     user("profile", Profile),

@@ -76,35 +76,29 @@ cors_enable :-
  *  @param Response La respuesta generada por el chatbot.
  */
 process_query(Input, Response) :-
-    normalize_input(Input, Words),  % Normalize the query
-    validacion_gramatical(Words, Resultado),  % Validate the grammar
-    (   Resultado == 'valido'  % If grammar is valid
-    ->  (   find_best_matching_theme(Words, Theme),  % Find the best matching theme
+    atom_string(InputAtom, Input),  % Ensure the input is treated as an atom
+    (   InputAtom == 'adios'
+    ->  Response = 'hasta la proxima 👋', server(8080), reset_user   % Call reset_user to reset the session
+          % Return a goodbye message
+    ;   normalize_input(Input, Words),  % Normalize the query
+        validacion_gramatical(Words, Resultado),  % Validate the grammar
+        (   Resultado == 'valido'  % If grammar is valid
+        ->  find_best_matching_theme(Words, Theme),  % Find the best matching theme
             store_user_theme(Words),  % Store the detected theme in the users profile
-            (   Theme == 'calorias'  % If the theme is 'calorias'
-            ->  store_calories(Words),  % Store calorie-related information
-                theme_response('calorias', ThemeResponse),  % Get the calorías response
-                check_diet_compatibility(MatchedMenus),  % Check for compatible diets
-                (   MatchedMenus \= []  % If there are matched diets
-                ->  extract_diet_body(MatchedMenus, ResponseBody),  % Extract only the body of the matched diet
-                    atomic_list_concat(ResponseBody, ', ', Response)  % Join the list into a single string without brackets
-                ;   Response = ThemeResponse  % Otherwise, use the calorías theme response
-                )
-            ;   theme_response(Theme, ThemeResponse),  % Get the response for other themes
-                check_diet_compatibility(MatchedMenus),  % Check for compatible diets
-                (   MatchedMenus \= []  % If there are matched diets
-                ->  extract_diet_body(MatchedMenus, ResponseBody),  % Extract only the body of the matched diet
-                    atomic_list_concat(ResponseBody, ', ', Response)  % Join the list into a single string without brackets
-                ;   Response = ThemeResponse  % Otherwise, use the theme response
-                )
+            (   Theme == 'calorias'
+            ->  store_calories(Words)  % Store calorie-related information for 'calorias'
+            ;   true  % No specific action needed for other themes
+            ),
+            theme_response(Theme, ThemeResponse),  % Get the theme response
+            check_diet_compatibility(MatchedMenus),  % Check for compatible diets
+            (   MatchedMenus \= []  % If there are matched diets
+            ->  extract_diet_body(MatchedMenus, ResponseBody),  % Extract the body of the matched diet
+                atomic_list_concat(ResponseBody, ', ', Response)  % Combine the response into a single string
+            ;   Response = ThemeResponse  % If no matched diets, use theme response
             )
-        ;   % If no specific theme matches, use fallback response
-            atomic_list_concat(Words, ' ', InputStr),
-            respond(InputStr, FallbackResponse),
-            Response = FallbackResponse
+        ;   % If grammar is not valid, return an error message
+            Response = Resultado
         )
-    ;   % If grammar is not valid, return an error message
-        Response = Resultado
     ).
 
 % Helper predicate to extract only the body of the diet plan
