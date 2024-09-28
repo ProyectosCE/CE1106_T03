@@ -75,19 +75,18 @@ cors_enable :-
  *  @param Input La consulta del usuario en formato de texto.
  *  @param Response La respuesta generada por el chatbot.
  */
-process_query(Input, Response) :-
-    normalize_input(Input, Words),  % Normalizar la consulta
-    validacion_gramatical(Words, Resultado),  % Validar gramaticalmente
-    (   Resultado == 'valido'  % Si la gramática es válida
-    ->  (   find_best_matching_theme(Words, Theme)  % Buscar el mejor tema
-        ->  theme_response(Theme, ThemeResponse),
-            % Usar la respuesta del tema y el resultado de la dieta en la respuesta final
-            Response = ThemeResponse
-        ;   % Si no se encuentra un tema específico, usar el fallback respond/2
-            atomic_list_concat(Words, ' ', InputStr),
-            respond(InputStr, FallbackResponse),
-            Response = FallbackResponse
+process_query(Input, _) :-
+    normalize_input(Input, Words),  % Normalize the query
+    validacion_gramatical(Words, Resultado),  % Validate the grammar
+    (   Resultado == 'valido'  % If grammar is valid
+    ->  find_best_matching_theme(Words, Theme),  % Find the best matching theme
+        store_user_theme(Words),  % Store the detected theme in the users profile
+        theme_response(Theme, ThemeResponse),  % Get the response based on the theme
+        check_diet_compatibility(MatchedMenus),  % Check for compatible diets
+        (   MatchedMenus \= []  % If there are matched diets
+        ->  reply_json(json{response: MatchedMenus})  % Send the matched diets as the response
+        ;   reply_json(json{response: ThemeResponse})  % Otherwise, send the theme response
         )
-    ;   % Si la gramática no es válida, devolver un mensaje de error genérico
-        Response = Resultado
+    ;   % If the grammar is not valid, return an error message
+        reply_json(json{response: "Error: Consulta no válida."})
     ).
