@@ -165,7 +165,8 @@ verbo_invertido([deberia|S],S).
 verbo_invertido([es|S],S).
 
 /** validación gramatical */
-validacion_gramatical(Oracion):- oracion(Oracion,[]), !.
-validacion_gramatical(Oracion):- pregunta(Oracion,[]), !.
-validacion_gramatical(Oracion):- orden(Oracion,[]), !.
-validacion_gramatical(Oracion):- nl, writeln('Oracion gramaticalmente incorrecta'), writeln('Escriba de nuevo su oracion'), nl, fail.
+/** validación gramatical con parámetro de salida */
+validacion_gramatical(Oracion, 'válida') :- oracion(Oracion, []), !.
+validacion_gramatical(Oracion, 'válida') :- pregunta(Oracion, []), !.
+validacion_gramatical(Oracion, 'válida') :- orden(Oracion, []), !.
+validacion_gramatical(_, 'Oración gramaticalmente incorrecta') :- !.

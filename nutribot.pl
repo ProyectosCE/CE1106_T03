@@ -58,7 +58,7 @@ theme_response('keto', 'La dieta keto es baja en carbohidratos y alta en grasas.
 theme_response('detox', 'Una dieta detox puede ayudar a limpiar tu cuerpo de toxinas. ¿Estás pensando en hacer una desintoxicación con jugos o batidos?').
 theme_response('hipercalorica', 'Una dieta hipercalórica puede ayudarte a ganar peso o energía. Asegúrate de consumir alimentos ricos en nutrientes.').
 theme_response('hipocalorica', 'Una dieta hipocalórica es efectiva para perder peso. ¿Te gustaría recomendaciones para mantenerte en déficit calórico?').
-
+theme_response('invalid', 'Lo siento, no entiendo tu consulta. ¿Puedes reformularla?').
 % Fallback responses to individual inputs
 respond('hola', 'Hola, ¿cómo puedo ayudarte hoy?').
 respond('como estas', 'Estoy bien, gracias. ¿Y tú?').
@@ -142,8 +142,10 @@ chat :-
 
     (   Words == ['adios'] 
     ->  write('Chatbot: ¡Hasta luego!'), nl
-    ;   (   validacion_gramatical(Words)  % Primero verificar gramática
-        ->  store_user_theme(Words),  % Almacenar el tema detectado en el perfil solo si la gramática es válida
+    ;   validacion_gramatical(Words, Resultado),  % Obtener resultado de la validación gramatical
+        (   (Resultado == 'válida')
+        ->  % Si la gramática es válida, procesar
+            store_user_theme(Words),  
             (   find_best_matching_theme(Words, Theme)
             ->  (   Theme == 'calorias'
                 ->  store_calories(Words),  % Procesar calorías si el tema es 'calorias'
@@ -152,17 +154,20 @@ chat :-
                     write('Chatbot: '), write(Response), nl
                 ;   theme_response(Theme, Response),
                     write('Chatbot: '), write(Response), nl
-                    
                 ),
                 check_diet_compatibility  % Verificar compatibilidad de dietas
-            ;   atomic_list_concat(Words, ' ', Input),
+            ;   % Si no se encuentra un tema específico
+                atomic_list_concat(Words, ' ', Input),
                 respond(Input, Response),
+                
                 write('Chatbot: '), write(Response), nl
             )
-        ;   write('Chatbot: Lo siento, tu gramática no es correcta. Por favor intenta de nuevo.'), nl  % Mensaje si la gramática no es válida
+        ;   % Si la gramática es incorrecta, imprimir el mensaje de error
+            write('Chatbot: '), write(Resultado), nl
         ),
         chat  % Repetir el ciclo del chat
     ).
+
 
 % Entry point
 comienzo :-

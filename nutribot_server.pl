@@ -15,7 +15,7 @@
  *  Importa los módulos del chatbot desde el archivo principal `nutribot.pl`.
  */
 :- consult('nutribot.pl').  % Importa el chatbot principal desde 'nutribot.pl'
-
+:- consult('nutribot_BNF.pl').  % Importa el chatbot principal desde 'nutribot.pl'
 /** server
  *  
  *  Inicia el servidor HTTP en el puerto especificado.
@@ -66,7 +66,7 @@ handle_options(options, _Request) :-
  */
 cors_enable :-
     format('Access-Control-Allow-Origin: *~n'),  % Permitir solicitudes desde cualquier origen
-    format('Access-Control-Allow-Methods: POST, OPTIONS~n'),  % Permitir los métodos POST y OPTIONS
+    format('Access-Control-Allow-Methods: POST, OPTIONS~n'),  % Permitir los étodos POST y OPTIONS
     format('Access-Control-Allow-Headers: Content-Type~n').  % Permitir el encabezado Content-Type
 
 /** process_query
@@ -77,8 +77,15 @@ cors_enable :-
  */
 process_query(Input, Response) :-
     normalize_input(Input, Words),  % Normalizar la consulta
-    (   find_best_matching_theme(Words, Theme)  % Buscar el tema que más coincida con la consulta
-    ->  theme_response(Theme, Response)  % Responder basándose en el tema
-    ;   atomic_list_concat(Words, ' ', InputStr),  % Si no hay coincidencia de tema, responder con una cadena concatenada
-        respond(InputStr, Response)  
+    validacion_gramatical(Words, Resultado),  % Obtener el resultado de la validación gramatical
+    (   (Resultado == 'válida')
+    ->  % Si la gramática es válida, procesar la consulta
+        (   find_best_matching_theme(Words, Theme)
+        ->  theme_response(Theme, Response)  % Responder basándose en el tema encontrado
+        ;   % Si no se encuentra un tema específico, usar el respond/2 como fallback
+            atomic_list_concat(Words, ' ', InputStr),
+            respond(InputStr, Response)  % Generar la respuesta basada en la entrada
+        )
+    ;   % Si la gramática es incorrecta, devolver el mensaje de error
+        Response = Resultado
     ).
