@@ -27,7 +27,7 @@ theme('detox', ['detox', 'desintoxicante', 'limpieza', 'jugos', 'toxinas', 'limp
 theme('hipercalorica', ['hipercalórica', 'alto en calorías', 'subir de peso', 'aumento', 'energía']).
 theme('hipocalorica', ['hipocalórica', 'baja en calorías', 'perder peso', 'dieta baja', 'deficit calórico']).
 
-theme('calorias',['calorias','cantidad','diarias','consumir','consumo','diario']).
+theme('calorias',['calorias','cantidad','diarias','consumir','consumo','diario','calorías']).
 thme('no_calorias',['no','calorias','tengo', 'especifico', 'se', 'cuantos']).
 
 % Define responses for themes

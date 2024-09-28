@@ -74,7 +74,9 @@ verbo([pensado|S],S).
 verbo([necesito|S],S).
 verbo([perder|S],S).
 verbo([hago|S],S).
-
+verbo([bajar|S],S).  /** Added "bajar" **/
+verbo([gustaria|S],S).  /** Added "bajar" **/
+verbo([quiero,bajar|S],S).  /** Added "bajar" **/
 /** adverbios */
 adverbio([mucho|S],S).
 adverbio([poco|S],S).
@@ -91,7 +93,7 @@ preposicional([en|S],S).
 preposicional([por|S],S).
 preposicional([a|S],S).
 preposicional([de|S],S).
-preposicional([con|S],S).
+preposicional([de,peso|S],S).  /** Added "de peso" **/
 
 /** números y frecuencias */
 numero([N|S],S) :- number(N), !.
@@ -136,12 +138,12 @@ sintagma_nominal(A,B):- numero(A,C), preposicional(C,D), sustantivo_g(D,B), !.
 /** sintagmas verbales */
 sintagma_verbal(A,B):- verbo(A,C), sintagma_nominal(C,B), !.
 sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sintagma_nominal(D,B), !.
-sintagma_verbal(A,B):- verbo(A,C), numero(C,D), sustantivo_g(D,B), !.
+sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sustantivo_g(D,B), !.  /** Added this rule for "bajar de peso" **/
+sintagma_verbal(A,B):- verbo(A,C), numero(C,D), sustantivo_g(D,B), !.  /** Support for numbers after verbs **/
 sintagma_verbal(A,B):- verbo(A,C), numero(C,D), sustantivo_g(D,B), !.
 sintagma_verbal(A,B):- numero(A,C), sustantivo_g(C,B), !.
 sintagma_verbal(A,B):- verbo(A,C), sustantivo_g(C,D), frecuencia(D,B), !.
-sintagma_verbal(A,B) :- verbo(A,C), sustantivo_g(C,D), numero(D,E), frecuencia(E,F), preposicional(F,G), sustantivo_g(G,B), !.
-
+sintagma_verbal(A,B):- verbo(A,C), sustantivo_g(C,D), numero(D,E), frecuencia(E,F), preposicional(F,G), sustantivo_g(G,B), !.
 
 /** preguntas y órdenes */
 pregunta(A,B):- pronombre_objeto(A,C), verbo_invertido(C,D), sintagma_verbal(D,B), !.
