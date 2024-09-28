@@ -14,7 +14,7 @@ theme('avanzado', ['mas', '5', 'veces', 'alta', 'frecuente', 'diariamente','sema
 theme('intermedio', ['3', 'veces', 'media', 'moderada','mucho','ejercicio']).
 theme('inicial', ['menos','veces', 'baja', 'poco', 'sedentario','no','ejercicio','casi','nada','hago']).
 theme('saludable',['enfermo','saludable','tengo','ninguna','enfermedad','padezco']).
-theme('proteica', ['proteica', 'alta en proteinas', 'proteínas', 'musculo', 'muscular','alta','dieta']).
+theme('proteica', ['proteica', 'alta en proteinas', 'proteínas', 'musculo', 'muscular','alta','dieta','quiero']).
 theme('alcalina', ['alcalina', 'ph', 'equilibrio', 'basica', 'ácido', 'acida']).
 theme('mediterranea', ['mediterranea', 'aceite de oliva', 'granos', 'pescado', 'frutas', 'verduras', 'saludable','quiero','dieta']).
 theme('vegetariana', ['vegetariana', 'sin', 'carne', 'vegetal', 'proteínas', 'vegetales', 'frutas', 'verduras','dieta','quiero']).
@@ -80,13 +80,13 @@ store_user_theme(Words) :-
     find_best_matching_theme(Words, Theme),
     retract(user("profile", Profile)),
     append([Theme], Profile, NewProfile),
-    assert(user("profile", NewProfile)), write(NewProfile), nl.
+    assert(user("profile", NewProfile)).
 
 store_calories(Words) :-
     extract_calories(Words, Calories),
     retract(user("profile", Profile)),
     append([Calories], Profile, NewProfile),
-    assert(user("profile", NewProfile)), write(NewProfile), nl.
+    assert(user("profile", NewProfile)).
 
 extract_calories(Words, Calories) :-
     append(_, [NumeroAtom, calorias], Words),

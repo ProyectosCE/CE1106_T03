@@ -78,7 +78,7 @@ cors_enable :-
 process_query(Input, Response) :-
     atom_string(InputAtom, Input),  % Ensure the input is treated as an atom
     (   InputAtom == 'adios'
-    ->  Response = 'hasta la proxima 👋', server(8080), reset_user   % Call reset_user to reset the session
+    ->  Response = 'hasta la proxima', reset_user   % Call reset_user to reset the session
           % Return a goodbye message
     ;   normalize_input(Input, Words),  % Normalize the query
         validacion_gramatical(Words, Resultado),  % Validate the grammar
