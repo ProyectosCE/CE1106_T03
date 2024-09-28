@@ -1,84 +1,69 @@
-/** servidor_http
- *  
- *  Modulo Prolog que implementa un servidor HTTP para interactuar con el chatbot NutriBot.
- *  @author Alexander Montero Vargas
- */
+:- use_module(library(http/thread_httpd)).
+:- use_module(library(http/http_dispatch)).
+:- use_module(library(http/http_json)).
+:- use_module(library(http/json)).
+:- set_prolog_flag(encoding, utf8).
 
-:- use_module(library(http/thread_httpd)).   
-:- use_module(library(http/http_dispatch)).  
-:- use_module(library(http/http_json)).      
-:- use_module(library(http/http_header)).    % Para el manejo de encabezados HTTP
-:- set_prolog_flag(encoding, utf8).          % Asegurar que Prolog trabaje con UTF-8
+% Consultar el archivo nutribot.pl
+:- consult('nutribot.pl').
 
-/** consult
- *  
- *  Importa los módulos del chatbot desde el archivo principal `nutribot.pl`.
- */
-:- consult('nutribot.pl').  % Importa el chatbot principal desde 'nutribot.pl'
-
-/** server
- *  
- *  Inicia el servidor HTTP en el puerto especificado.
- *  @param Port El puerto en el que se iniciara el servidor.
- */
+% Iniciar el servidor
 server(Port) :-
     http_server(http_dispatch, [port(Port)]).
 
-/** http_handler(root(chat), handle_chat_request, [])
- *  
- *  Define una ruta HTTP para manejar las consultas al chatbot.
- */
-:- http_handler(root(chat), handle_chat_request, []). 
+% Definir un manejador HTTP para las solicitudes en /nutribot
+:- http_handler(root(nutribot), handle_nutribot_request, []).
 
-/** handle_chat_request
- *  
- *  Maneja las solicitudes HTTP POST y OPTIONS.
- *  @param Request La solicitud HTTP.
- */
-handle_chat_request(Request) :-
-    memberchk(method(Options), Request), 
-    handle_options(Options, Request).
-
-/** handle_options
- *  
- *  Maneja solicitudes POST y OPTIONS.
- *  @param Method El metodo HTTP (post u options).
- *  @param Request La solicitud HTTP.
- */
-handle_options(post, Request) :-
-    !, 
-    cors_enable,  % Habilitar CORS
-    http_read_json_dict(Request, QueryDict),  % Leer el cuerpo de la solicitud en formato JSON
-    Query = QueryDict.get(query),  % Extraer la consulta del campo "query"
-    process_query(Query, Response),  % Procesar la consulta usando el chatbot
-    format('Content-type: application/json; charset=UTF-8~n'),  % Asegurar que el contenido sea UTF-8
-    reply_json_dict(_{response: Response}, [json_object(dict)]).  % Devolver la respuesta en formato JSON
-
-handle_options(options, _Request) :-
-    !,  
-    cors_enable,  % Habilitar CORS para solicitudes OPTIONS
-    format('Content-type: text/plain; charset=UTF-8~n~n'),  
-    format('OK').
-
-/** cors_enable
- *  
- *  Habilita CORS en la respuesta HTTP.
- */
-cors_enable :-
-    format('Access-Control-Allow-Origin: *~n'),  % Permitir solicitudes desde cualquier origen
-    format('Access-Control-Allow-Methods: POST, OPTIONS~n'),  % Permitir los métodos POST y OPTIONS
-    format('Access-Control-Allow-Headers: Content-Type~n').  % Permitir el encabezado Content-Type
-
-/** process_query
- *  
- *  Procesa una consulta enviada al chatbot.
- *  @param Input La consulta del usuario en formato de texto.
- *  @param Response La respuesta generada por el chatbot.
- */
-process_query(Input, Response) :-
-    normalize_input(Input, Words),  % Normalizar la consulta
-    (   find_best_matching_theme(Words, Theme)  % Buscar el tema que más coincida con la consulta
-    ->  theme_response(Theme, Response)  % Responder basándose en el tema
-    ;   atomic_list_concat(Words, ' ', InputStr),  % Si no hay coincidencia de tema, responder con una cadena concatenada
-        respond(InputStr, Response)  
+% Manejar solicitudes POST
+handle_nutribot_request(Request) :-
+    catch(
+        (
+            % Leer el cuerpo JSON de la solicitud
+            http_read_json_dict(Request, JSONIn),
+            % Asegurarse de que el campo "query" está presente y es válido
+            (   _{query: Input} :< JSONIn
+            ->  atom_string(Input, InputText),
+                % Procesar la entrada del chatbot
+                process_chatbot_input(InputText, Response),
+                % Proteger la escritura de la respuesta en el stream
+                reply_safe_json(Response)
+            ;   reply_safe_json("Lo siento, no entiendo tu pregunta.")
+            )
+        ),
+        Error,
+        handle_error(Error)
     ).
+
+% Procesar la entrada del chatbot
+process_chatbot_input(Input, Response) :-
+    % Normalizar la entrada
+    normalize_input(Input, Words),
+    % Verificar si la entrada pasa la validación gramatical
+    (   validacion_gramatical(Words)
+    ->  % Si la validación es correcta, buscar el tema coincidente
+        (   find_best_matching_theme(Words, Theme)
+        ->  theme_response(Theme, Response)
+        ;   Response = "Lo siento, no entiendo tu pregunta."  % Si no hay tema coincidente
+        )
+    ;   Response = "Lo siento, tu gramática no es correcta. Por favor intenta de nuevo."  % Si la gramática falla
+    ).
+
+% Devolver respuesta segura en JSON
+reply_safe_json(Response) :-
+    catch(
+        (
+            % Intentar enviar la respuesta como JSON
+            reply_json_dict(_{response: Response}),
+            flush_output  % Asegurar que el stream se vacíe correctamente
+        ),
+        _Error,
+        % Si hay un error, manejarlo y devolver una respuesta simple
+        reply_json_dict(_{code: 500, message: "Error interno del servidor."})
+    ).
+
+% Manejar errores
+handle_error(Error) :-
+    format(user_error, 'Error: ~w~n', [Error]),  % Imprimir el error en la consola
+    % Devolver un error JSON al cliente
+    reply_json_dict(_{code: 500, message: "Error en el procesamiento de la solicitud."}),
+    flush_output.  % Asegurar que el stream se vacíe correctamente
