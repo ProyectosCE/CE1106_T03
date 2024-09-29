@@ -22,13 +22,13 @@ user("profile", []).
  */
 theme('welcom', ['hola', 'como', 'estas', 'buenas', 'holi','holap','uwu']).
 theme('goodbye', ['adios', 'hasta', 'luego','chao']).
-theme('help_need', ['ayuda', 'sobre', 'peso', 'deseo', 'quiero', 'me', 'gustaria','perder','bajar','sobre','peso']).
-theme('Dislipidemia',['problema','control','colesterol','Dislipidemia','tengo','controlando']).
-theme('Hipercolesterolemia',['Hipercolesterolemia','aumento','niveles','colesterol','sangre']).
+theme('help_need', ['ayuda', 'sobre', 'peso', 'deseo', 'quiero', 'gustaria','perder','bajar','sobre','peso','sobrepeso','tengo']).
+theme('Dislipidemia',['problema','control','colesterol','dislipidemia','tengo','controlando']).
+theme('Hipercolesterolemia',['hipercolesterolemia','aumento','niveles','colesterol','sangre']).
 theme('avanzado', ['mas', '5', 'veces', 'alta', 'frecuente', 'diariamente','semana','ejercicio']).
 theme('intermedio', ['3', 'veces', 'media', 'moderada','mucho','ejercicio']).
 theme('inicial', ['menos','veces', 'baja', 'poco', 'sedentario','no','ejercicio','casi','nada','hago']).
-theme('saludable',['enfermo','saludable','tengo','ninguna','enfermedad','padezco']).
+theme('saludable',['enfermo','saludable','ninguna','enfermedad','padezco']).
 theme('proteica', ['proteica', 'alta en proteinas', 'proteínas', 'musculo', 'muscular','alta','dieta','quiero']).
 theme('alcalina', ['alcalina', 'ph', 'equilibrio', 'basica', 'ácido', 'acida']).
 theme('mediterranea', ['mediterranea', 'aceite de oliva', 'granos', 'pescado', 'frutas', 'verduras', 'saludable','quiero','dieta']).
@@ -37,7 +37,7 @@ theme('keto', ['keto', 'cetogénica', 'baja en carbohidratos', 'grasas', 'cetona
 theme('detox', ['detox', 'desintoxicante', 'limpieza', 'jugos', 'toxinas', 'limpiar']).
 theme('hipercalorica', ['hipercalórica', 'alto',  'calorias', 'subir', 'peso', 'aumento', 'energía']).
 theme('hipocalorica', ['hipocalórica', 'baja', 'calorías', 'perder', 'peso', 'dieta baja', 'deficit', 'calórico']).
-theme('calorias',['calorias','cantidad','diarias','consumir','consumo','diario','calorías','quiero']).
+theme('calorias',['calorias','cantidad','diarias','consumir','consumo','diario','calorías','quiero','unas']).
 
 /**
  * Responses associated with each theme, used to generate chatbot responses based on detected themes.
