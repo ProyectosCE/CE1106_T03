@@ -14,7 +14,7 @@ Consulta el archivo LICENSE para más detalles.
 Para este archivo se tomaron como referencia general las siguientes fuentes:
 
  * Documentación propia de Prolog: https://www.swi-prolog.org/
-* Interfaz basada en la interfaz del proyecto "NutriTEC" del usuario de GitHub @johnnyzaet08.
+* BNF basado en BNF del proyecto "NutriTEC" del usuario de GitHub @johnnyzaet08.
   Puede acceder a su archivo en la dirección:
   https://github.com/johnnyzaet08/NutriTEC
 
