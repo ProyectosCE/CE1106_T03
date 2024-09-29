@@ -203,7 +203,7 @@ chat :-
                     (   member(Theme, ['proteica', 'alcalina', 'mediterranea', 'vegetariana', 'keto', 'detox', 'hipercalorica', 'hipocalorica'])
                     ->  (MatchedMenus == [] 
                         -> writeln('No hay menú disponible')
-                        ; true)  % Ya imprimió el menú, no hace falta más
+                        ; true)  % Ya imprimió el menú, no hace falta ás
                     ;   true  % No hace nada extra para otros temas
                     )
                 )

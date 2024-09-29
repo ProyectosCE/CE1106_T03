@@ -175,6 +175,11 @@ invalid_combination([Determinante|S]) :-
     subject_determiner([Determinante|Rest], []),  % Check if its a subject determiner.
     sustantivo_g(S, _).  % Check if its followed by a noun.
 
+invalid_combination([Sustantivo|Rest]) :-
+    sustantivo_g([Sustantivo|_], []),  % Ensure the first element is a valid noun.
+    subject_determiner(Rest, _).  % Check if it is followed by a subject determiner.
+
+
 % Main sentence structure (Subject + Verb + Object)
 oracion(A, B) :- sintagma_nominal(A, C), sintagma_verbal(C, B), !.
 
@@ -190,6 +195,8 @@ oracion_flexible(A, B) :- sustantivo_g(A, B), !.
 oracion(A, B) :- negativo(A, C), sintagma_verbal(C, B), !.
 oracion(A, B) :- oracion_simple(A, B), !.
 oracion(A, B) :- oracion_flexible(A, B), !.
+
+
 
 % Validate grammar
 validacion_gramatical(Oracion, 'valido') :- oracion(Oracion, []), !.
