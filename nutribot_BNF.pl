@@ -13,10 +13,10 @@ Consulta el archivo LICENSE para más detalles.
 ==================================REFERENCIAS================================================
 Para este archivo se tomaron como referencia general las siguientes fuentes:
 
- * Documentación propia de Racket/gui: https://docs.racket-lang.org/gui/
- * Interfaz basada en la interfaz del proyecto "Tic-tac-racket" del usuario de github @JonDGS.
-   Puede acceder a su archivo de interfaz gráfica en la dirección:
-   https://github.com/JonDGS/Tic-tac-Racket/blob/master/gui.rkt
+ * Documentación propia de Prolog: https://www.swi-prolog.org/
+* Interfaz basada en la interfaz del proyecto "NutriTEC" del usuario de GitHub @johnnyzaet08.
+  Puede acceder a su archivo en la dirección:
+  https://github.com/johnnyzaet08/NutriTEC
 
  ===========================================================================================
 */
