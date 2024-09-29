@@ -1,3 +1,25 @@
+/* 
+================================== LICENCIA ================================================== 
+MIT License
+Copyright (c) 2024 José Bernardo Barquero Bonilla,
+                   Jose Eduardo Campos Salazar,
+                   Jimmy Feng Feng,
+                   Alexander Montero Vargas
+Consulta el archivo LICENSE para más detalles.
+==============================================================================================
+*/
+
+/* 
+==================================REFERENCIAS================================================
+Para este archivo se tomaron como referencia general las siguientes fuentes:
+
+ * Documentación propia de Prolog: https://www.swi-prolog.org/
+* Documentación de http prolog: https://www.swi-prolog.org/pldoc/doc_for?object=section(%27packages/http.html%27)
+
+ ===========================================================================================
+*/
+
+
 /** servidor_http
  *  
  *  Módulo Prolog que implementa un servidor HTTP para interactuar con el chatbot NutriBot.
