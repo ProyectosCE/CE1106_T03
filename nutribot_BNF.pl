@@ -1,3 +1,7 @@
+
+% Este código está basado en el repositorio NutriTEC de GitHub:
+% https://github.com/johnnyzaet08/NutriTEC
+
 /** NutriBot BNF */
 
 :-style_check(-singleton).
@@ -6,7 +10,9 @@
 :- discontiguous oracion/2.
 :- discontiguous pregunta/2.
 
-/** start (Interjecciones y saludos) */
+/** start (Interjecciones y saludos)
+ *  Handles basic greetings and common interjections
+ */
 start([hola]).
 start([gracias]).
 start([buenas]).
@@ -14,25 +20,33 @@ start([adios]).
 start([chao]).
 start([hola,nutribot]).
 
-/** final */
+/** final
+ *  Handles end phrases such as thank you and goodbyes
+ */
 final([gracias]).
 final([muchas,gracias]).
 final([chao]).
 final([adios]).
 
-/** negaciones */
+/** negaciones
+ *  Recognizes negations in sentences
+ */
 negativo([no|S],S).
 negativo([nunca|S],S).
 negativo([jamas|S],S).
 negativo([nada|S],S).
 
-/** afirmaciones */
+/** afirmaciones
+ *  Recognizes affirmative responses
+ */
 afirmativo([si|S],S).
 afirmativo([claro|S],S).
 afirmativo([por,supuesto|S],S).
 afirmativo([definitivamente|S],S).
 
-/** determinantes */
+/** determinantes
+ *  Handles determiners and pronouns
+ */
 determinante([yo|S],S).
 determinante([tu|S],S).
 determinante([el|S],S).
@@ -47,7 +61,9 @@ determinante([mi|S],S).
 determinante([las|S],S).
 determinante([los|S],S).
 
-/** sustantivos generales */
+/** sustantivos generales
+ *  General nouns related to health, diet, and exercise
+ */
 sustantivo_g([sobrepeso|S],S).
 sustantivo_g([enfermedades|S],S).
 sustantivo_g([salud|S],S).
@@ -64,7 +80,9 @@ sustantivo_g([control|S],S).
 sustantivo_g([colesterol|S],S).
 sustantivo_g([_,_|S],S).
 
-/** verbos */
+/** verbos
+ *  Verb definitions for understanding user queries
+ */
 verbo([tengo|S],S).
 verbo([puede|S],S).
 verbo([ayudar|S],S).
@@ -84,18 +102,24 @@ verbo([gustaria|S],S).
 verbo([quiero,bajar|S],S). 
 verbo([controlando|S],S).  
 
-/** adverbios */
+/** adverbios
+ *  Adverbs and other miscellaneous modifiers
+ */
 adverbio([mucho|S],S).
 adverbio([poco|S],S).
 adverbio(S,S).
 
-/** frases preposicionales y modificadores */
+/** frases preposicionales y modificadores
+ *  Prepositional phrases and additional modifiers
+ */
 modificador([al,menos|S],S).
 modificador([mas,de|S],S).
 modificador([menos,de|S],S).
 modificador(S,S).
 
-/** frases preposicionales */
+/** frases preposicionales
+ *  Prepositions and related phrases for sentence structure
+ */
 preposicional([en|S],S).
 preposicional([por|S],S).
 preposicional([a|S],S).
@@ -111,7 +135,9 @@ preposicional([con,una|S],S). % Handle "con el"
 preposicional([con,un|S],S). % Handle "con el"
 preposicional([del,colesterol|S],S). % Handle "del colesterol"
 
-/** números y frecuencias */
+/** números y frecuencias
+ *  Numbers and frequency expressions
+ */
 numero([N|S],S) :- number(N), !.
 numero([N|S],S) :- atom_number(N, _), !. % Allow for atomic representation of numbers.
 frecuencia([veces|S],S).
@@ -119,29 +145,39 @@ frecuencia([dias|S],S).
 frecuencia([semanas|S],S).
 frec([_,_|S],S).
 
-/** manejo de oraciones */
+/** manejo de oraciones
+ *  Handling of different sentence structures
+ */
 oracion(A,B):- sintagma_nominal(A,C), sintagma_verbal(C,B), !.
 oracion(A,B):- sintagma_verbal(A,B), !.
 oracion(A,B):- start(A), B = [].
 
-/** negaciones */
+/** negaciones
+ *  Sentence structure for negative sentences
+ */
 oracion(A,B):- negativo(A,C), sintagma_verbal(C,B), !.
 oracion(A,B):- negativo(A,C), verbo(C,D), preposicional(D,E), sustantivo_g(E,B), !.
 
-/** preguntas */
+/** preguntas
+ *  Handling question structures
+ */
 pregunta(A,B):- pronombre_objeto(A,C), verbo(C,D), preposicional(D,E), sintagma_nominal(E,B), !.
 pregunta(A,B):- pronombre_objeto(A,C), verbo(C,D), sustantivo_g(D,B), !.
 pregunta(A,B):- verbo_invertido(A,C), sintagma_nominal(C,B), !.
 pregunta(A,B):- verbo_invertido(A,C), sintagma_verbal(C,B), !.
 
-/** oraciones compuestas */
+/** oraciones compuestas
+ *  Compound sentences (comma-separated)
+ */
 oracion_compuesta(A,B):- oracion(A,C), [','|C], oracion(C,B), !.
 oracion_compuesta(A,B):- oracion_simple(A,B), !.
 
 
 gerundio([controlando|S],S).
 
-/** oraciones simples */
+/** oraciones simples
+ *  Simple sentence structures
+ */
 oracion_simple([], []).
 oracion_simple([Word|S],S) :- sustantivo_g([Word|S],S), !.
 oracion_simple([Word|S],S) :- verbo([Word|S],S), !.
@@ -149,7 +185,9 @@ oracion_simple([Word|S],S) :- preposicional([Word|S],S), !.
 oracion_simple([Word|S],S) :- numero([Word|S],S), !.
 
 
-/** sintagmas nominales */
+/** sintagmas nominales
+ *  Noun phrases handling
+ */
 sintagma_nominal(A,B):- determinante(A,C), sustantivo_g(C,B), !.
 sintagma_nominal(A,B):- sustantivo_g(A,B), !.
 sintagma_nominal(A,B):- numero(A,C), sustantivo_g(C,B), !.
@@ -157,7 +195,10 @@ sintagma_nominal(A,B):- numero(A,C), preposicional(C,D), sustantivo_g(D,B), !.
 sintagma_nominal(A,B):- determinante(A,C), sustantivo_g(C,D), preposicional(D,E), sustantivo_g(E,B), !.
 sintagma_nominal(A,B):- determinante(A,C), sustantivo_g(C,B), !. 
 sintagma_nominal(A,B):- preposicional(A,C), determinante(C,D), sustantivo_g(D,B), !. /** Nueva regla **/
-/** sintagmas verbales */
+
+/** sintagmas verbales
+ *  Verb phrases handling
+ */
 sintagma_verbal(A,B):- verbo(A,C), sintagma_nominal(C,B), !.
 sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sintagma_nominal(D,B), !.
 sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sustantivo_g(D,B), !.  /** Added this rule for "bajar de peso" **/
@@ -173,7 +214,10 @@ sintagma_verbal(A,B):- verbo(A,C), sustantivo_g(C,D), preposicional(D,E), sustan
 sintagma_verbal(A,B):- verbo(A,C), sintagma_nominal(C,B), !.
 sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), sintagma_nominal(D,B), !.
 sintagma_verbal(A,B):- verbo(A,C), preposicional(C,D), determinante(D,E), sustantivo_g(E,B), !. /** Nueva regla **/
-/** preguntas y órdenes */
+
+/** preguntas y órdenes
+ *  Handling question and command structures
+ */
 pregunta(A,B):- pronombre_objeto(A,C), verbo_invertido(C,D), sintagma_verbal(D,B), !.
 pregunta(A,B):- verbo_invertido(A,C), sintagma_nominal(C,B), !.
 pregunta(A,B):- verbo_invertido(A,C), preposicional(C,D), sustantivo_g(D,B), !.
