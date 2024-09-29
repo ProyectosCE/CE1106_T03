@@ -40,13 +40,13 @@ theme_response('intermedio', 'Hacer ejercicio 3 veces por semana es un buen inic
 theme_response('inicial', 'Es importante aumentar tu actividad física para mejorar tu salud, intenta hacer ejercicio al menos 3 veces por semana. ¿Tienes un tipo de dieta te gustaría realizar?').
 
 theme_response('proteica', 'Te recomiendo una dieta alta en proteínas para ganar masa muscular y mantener tu energía.').
-theme_response('alcalina', 'Una dieta alcalina te ayudará a equilibrar el pH de tu cuerpo. ¿Te gustaría recibir algunas recomendaciones?').
+theme_response('alcalina', 'Una dieta alcalina te ayudará a equilibrar el pH de tu cuerpo.').
 theme_response('mediterranea', 'La dieta mediterránea es excelente para la salud cardiovascular, con un enfoque en alimentos saludables como aceite de oliva, pescado, y frutas.').
-theme_response('vegetariana', 'Una dieta vegetariana es una excelente opción. ¿Te gustaría conocer opciones ricas en proteínas vegetales?').
-theme_response('keto', 'La dieta keto es baja en carbohidratos y alta en grasas. ¿Te gustaría aprender más sobre cómo entrar en cetosis?').
-theme_response('detox', 'Una dieta detox puede ayudar a limpiar tu cuerpo de toxinas. ¿Estás pensando en hacer una desintoxicación con jugos o batidos?').
+theme_response('vegetariana', 'Una dieta vegetariana es una excelente opción.').
+theme_response('keto', 'La dieta keto es baja en carbohidratos y alta en grasas.').
+theme_response('detox', 'Una dieta detox puede ayudar a limpiar tu cuerpo de toxinas.').
 theme_response('hipercalorica', 'Una dieta hipercalórica puede ayudarte a ganar peso o energía. Asegúrate de consumir alimentos ricos en nutrientes.').
-theme_response('hipocalorica', 'Una dieta hipocalórica es efectiva para perder peso. ¿Te gustaría recomendaciones para mantenerte en déficit calórico?').
+theme_response('hipocalorica', 'Una dieta hipocalórica es efectiva para perder peso.').
 theme_response('invalid', 'Lo siento, no entiendo tu consulta. ¿Puedes reformularla?').
 
 respond('hola', 'Hola, ¿cómo puedo ayudarte hoy?').
@@ -120,17 +120,30 @@ chat :-
         (   (Resultado == 'valido')
         ->  store_user_theme(Words),  
             (   find_best_matching_theme(Words, Theme)
-            ->  (   Theme == 'calorias'
-                ->  store_calories(Words),
-                    theme_response('calorias', Response),
-                    check_diet_compatibility(MatchedMenus),
+            ->  (   Theme == 'calorias' 
+                ->  store_calories(Words),  % Almacenar las calorías proporcionadas por el usuario
+                    theme_response('calorias', Response),  % Respuesta específica para calorías
                     write('Chatbot: '), write(Response), nl,
+                    
+                    % Verificación de compatibilidad de dietas
+                    check_diet_compatibility(MatchedMenus),
                     print_menus(MatchedMenus)
+                    
                 ;   theme_response(Theme, Response),
-                    write('Chatbot: '), write(Response), nl
-                ),
-                check_diet_compatibility(MatchedMenus),
-                print_menus(MatchedMenus)
+                    write('Chatbot: '), write(Response), nl,
+                    
+                    % Verificación de compatibilidad de dietas
+                    check_diet_compatibility(MatchedMenus),
+                    print_menus(MatchedMenus),
+                    
+                    % Para temas específicos: si no encuentra menú, lo informa
+                    (   member(Theme, ['proteica', 'alcalina', 'mediterranea', 'vegetariana', 'keto', 'detox', 'hipercalorica', 'hipocalorica'])
+                    ->  (MatchedMenus == [] 
+                        -> writeln('No hay menú disponible')
+                        ; true)  % Ya imprimió el menú, no hace falta más
+                    ;   true  % No hace nada extra para otros temas
+                    )
+                )
             ;   atomic_list_concat(Words, ' ', Input),
                 respond(Input, Response),
                 write('Chatbot: '), write(Response), nl
@@ -139,6 +152,7 @@ chat :-
         ),
         chat  
     ).
+
 
 print_menus([]).  
 print_menus([NombreDieta-Menu|Rest]) :-
@@ -166,8 +180,11 @@ print_user :-
     user("profile", Profile),
     write('Perfil del usuario: '), write(Profile), nl.
 
-check :-
+check :- 
     reset_user,
-    set_default_user,
     print_user,
-    check_diet_compatibility.
+    check_diet_compatibility(MatchedDiets),  % Llamada a check_diet_compatibility
+    (   MatchedDiets == [] 
+    ->  writeln('No hay menú disponible') 
+    ;   print_menus(MatchedDiets)  % Imprime los menús si hay dietas compatibles
+    ).
