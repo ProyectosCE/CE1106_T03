@@ -1,3 +1,24 @@
+/* 
+================================== LICENCIA ================================================== 
+MIT License
+Copyright (c) 2024 José Bernardo Barquero Bonilla,
+                   Jose Eduardo Campos Salazar,
+                   Jimmy Feng Feng,
+                   Alexander Montero Vargas
+Consulta el archivo LICENSE para más detalles.
+==============================================================================================
+*/
+
+/* 
+==================================REFERENCIAS================================================
+Para este archivo se tomaron como referencia general las siguientes fuentes:
+
+ * Documentación propia de Prolog: https://www.swi-prolog.org/
+ ===========================================================================================
+*/
+
+
+
 /**
  * nutribot_BNF and nutribot_DB are consulted for loading additional rules or facts.
  */
